@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 
-export function DashboardPage() {
+export default function DashboardPage() {
   return (
     <Typography variant="h3">
       Dashboard
