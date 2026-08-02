@@ -3,6 +3,8 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "../layouts/AppLayout";
 import DashboardPage from "../../modules/dashboard/pages/DashboardPage";
 import CategoryPage from "../../modules/categories/pages/CategoryPage";
+import SupplierPage from "../../modules/suppliers/pages/SupplierPage";
+import ProductPage from "../../modules/products/pages/ProductPage";
 import LoginPage from "../../modules/auth/pages/LoginPage";
 import { ProtectedRoute } from "../../shared/components/ProtectedRoute";
 
@@ -24,6 +26,14 @@ export const router = createBrowserRouter([
                     {
                         path: "/categories",
                         element: <CategoryPage />,
+                    },
+                    {
+                        path: "/suppliers",
+                        element: <SupplierPage />,
+                    },
+                    {
+                        path: "/products",
+                        element: <ProductPage />,
                     },
                 ],
             },
