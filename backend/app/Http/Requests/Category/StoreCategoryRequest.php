@@ -14,14 +14,14 @@ class StoreCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'NOME' => [
+            'name' => [
                 'required',
                 'string',
                 'max:100',
-                'unique:CATEGORIAS,NOME',
+                'unique:categories,name',
             ],
 
-            'ATIVO' => [
+            'active' => [
                 'sometimes',
                 'boolean',
             ],
@@ -31,11 +31,11 @@ class StoreCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'NOME.required' => 'O nome da categoria é obrigatório.',
-            'NOME.unique' => 'Já existe uma categoria com esse nome.',
-            'NOME.max' => 'O nome deve possuir no máximo 100 caracteres.',
+            'name.required' => 'O nome da categoria é obrigatório.',
+            'name.unique' => 'Já existe uma categoria com esse nome.',
+            'name.max' => 'O nome deve possuir no máximo 100 caracteres.',
 
-            'ATIVO.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
+            'active.boolean' => 'O campo ativo deve ser verdadeiro ou falso.',
         ];
     }
 }
