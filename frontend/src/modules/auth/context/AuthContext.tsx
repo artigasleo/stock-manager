@@ -1,17 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 import { fetchMe, login as loginRequest, logout as logoutRequest } from "../services/authService";
-import type { User } from "../types";
-
-type AuthContextValue = {
-  user: User | null | undefined;
-  isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-};
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+import { AuthContext } from "../hooks/useAuth";
 
 const ME_QUERY_KEY = ["auth", "me"];
 
@@ -56,14 +47,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-
-  return context;
 }

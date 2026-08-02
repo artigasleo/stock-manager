@@ -1,6 +1,6 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
 
-import { useAuth } from "../../../modules/auth/context/AuthContext";
+import { useAuth } from "../../../modules/auth/hooks/useAuth";
 
 export function Header() {
   const { user, logout } = useAuth();
