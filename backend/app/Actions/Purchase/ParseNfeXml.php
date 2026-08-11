@@ -14,7 +14,7 @@ class ParseNfeXml
      *     supplier_document: string,
      *     supplier_name: string,
      *     invoice_number: string,
-     *     items: array<int, array{code: string, name: string, quantity: float, unit_cost: float}>,
+     *     items: array<int, array{code: string, barcode: ?string, name: string, quantity: float, unit_cost: float}>,
      * }
      */
     public function execute(string $xmlContent): array
@@ -44,7 +44,7 @@ class ParseNfeXml
     }
 
     /**
-     * @return array<int, array{code: string, name: string, quantity: float, unit_cost: float}>
+     * @return array<int, array{code: string, barcode: ?string, name: string, quantity: float, unit_cost: float}>
      */
     private function parseItems(SimpleXMLElement $infNFe): array
     {
@@ -59,6 +59,7 @@ class ParseNfeXml
 
             $items[] = [
                 'code' => (string) $prod->cProd,
+                'barcode' => $this->normalizeBarcode((string) ($prod->cEAN ?? '')),
                 'name' => (string) $prod->xProd,
                 'quantity' => (float) $prod->qCom,
                 'unit_cost' => (float) $prod->vUnCom,
@@ -70,6 +71,18 @@ class ParseNfeXml
         }
 
         return $items;
+    }
+
+    private function normalizeBarcode(string $value): ?string
+    {
+        $value = trim($value);
+
+        // NF-e uses the literal string "SEM GTIN" when a product has no standard barcode.
+        if ($value === '' || strcasecmp($value, 'SEM GTIN') === 0) {
+            return null;
+        }
+
+        return $value;
     }
 
     private function onlyDigits(string $value): string

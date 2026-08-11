@@ -26,6 +26,7 @@
                 <thead class="bg-stone-100 text-left text-stone-600">
                     <tr>
                         <th class="px-4 py-3">Código</th>
+                        <th class="px-4 py-3">Cód. Barras</th>
                         <th class="px-4 py-3">Nome</th>
                         <th class="px-4 py-3">Categoria</th>
                         <th class="px-4 py-3">Fornecedor</th>
@@ -39,6 +40,7 @@
                     @forelse ($products as $product)
                         <tr>
                             <td class="px-4 py-3">{{ $product->code }}</td>
+                            <td class="px-4 py-3">{{ $product->barcode ?? '—' }}</td>
                             <td class="px-4 py-3">{{ $product->name }}</td>
                             <td class="px-4 py-3">{{ $product->category->name }}</td>
                             <td class="px-4 py-3">{{ $product->supplier?->name ?? '—' }}</td>
@@ -74,7 +76,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-4 py-6 text-center text-stone-500">
+                            <td colspan="9" class="px-4 py-6 text-center text-stone-500">
                                 Nenhum produto cadastrado.
                             </td>
                         </tr>
@@ -101,20 +103,20 @@
                     <input type="hidden" name="_method" :value="editing ? 'PUT' : 'POST'">
                     <input type="hidden" name="editing_id" :value="editing ? editing.id : ''">
 
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium mb-1">Nome</label>
-                            <input
-                                type="text"
-                                name="name"
-                                :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                            >
-                            @error('name')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Nome</label>
+                        <input
+                            type="text"
+                            name="name"
+                            :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
+                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                        >
+                        @error('name')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
 
+                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Código</label>
                             <input
@@ -124,6 +126,19 @@
                                 class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
                             @error('code')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Código de barras</label>
+                            <input
+                                type="text"
+                                name="barcode"
+                                :value="editing && editing.barcode !== undefined ? editing.barcode : '{{ old('barcode') }}'"
+                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                            @error('barcode')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>

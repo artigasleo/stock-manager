@@ -29,6 +29,44 @@
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '' }]" }},
+            barcodeError: '',
+            productsByBarcode: @js($products->filter(fn ($p) => $p->barcode)->pluck('id', 'barcode')),
+            productPrices: @js($products->pluck('sale_price', 'id')),
+            fillPrice(item) {
+                if (!item.unit_price && item.product_id) {
+                    item.unit_price = this.productPrices[item.product_id] ?? '';
+                }
+            },
+            addByBarcode(rawCode) {
+                const barcode = rawCode.trim();
+                if (!barcode) return;
+
+                const productId = this.productsByBarcode[barcode];
+
+                if (!productId) {
+                    this.barcodeError = 'Nenhum produto encontrado com o código de barras ' + barcode + '.';
+                    return;
+                }
+
+                this.barcodeError = '';
+
+                const existing = this.items.find((item) => item.product_id == productId);
+
+                if (existing) {
+                    existing.quantity = Number(existing.quantity || 0) + 1;
+                    return;
+                }
+
+                if (this.items.length === 1 && !this.items[0].product_id) {
+                    this.items = [];
+                }
+
+                this.items.push({
+                    product_id: productId,
+                    quantity: 1,
+                    unit_price: this.productPrices[productId] ?? '',
+                });
+            },
         }"
     >
         <div class="flex items-center justify-between mb-4">
@@ -149,6 +187,17 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium mb-1">Código de barras</label>
+                        <input
+                            type="text"
+                            placeholder="Bipe ou digite o código e pressione Enter"
+                            @keydown.enter.prevent="addByBarcode($event.target.value); $event.target.value = ''"
+                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                        >
+                        <p x-show="barcodeError" x-text="barcodeError" x-cloak class="mt-1 text-sm text-red-600"></p>
+                    </div>
+
+                    <div>
                         <div class="flex items-center justify-between mb-2">
                             <label class="block text-sm font-medium">Itens</label>
                             <button
@@ -166,6 +215,7 @@
                                     <select
                                         :name="`items[${index}][product_id]`"
                                         x-model="item.product_id"
+                                        @change="fillPrice(item)"
                                         class="col-span-6 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
                                         <option value="">Selecione...</option>

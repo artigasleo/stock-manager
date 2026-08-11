@@ -47,7 +47,11 @@ class PurchaseController extends Controller
         $unmatchedCodes = [];
 
         $items = array_map(function (array $item) use (&$unmatchedCodes) {
-            $product = Product::where('code', $item['code'])->first();
+            $product = $item['barcode']
+                ? Product::where('barcode', $item['barcode'])->first()
+                : null;
+
+            $product ??= Product::where('code', $item['code'])->first();
 
             if (! $product) {
                 $unmatchedCodes[] = $item['code'];

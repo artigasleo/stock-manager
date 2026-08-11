@@ -12,6 +12,7 @@ class CreateProduct
         $product = Product::create([
             'name' => $request->validated('name'),
             'code' => $request->validated('code'),
+            'barcode' => $request->validated('barcode'),
             'category_id' => $request->validated('category_id'),
             'supplier_id' => $request->validated('supplier_id'),
             'quantity' => $request->validated('quantity') ?? 0,

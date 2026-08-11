@@ -27,6 +27,13 @@ class StoreProductRequest extends FormRequest
                 'unique:products,code',
             ],
 
+            'barcode' => [
+                'nullable',
+                'string',
+                'max:64',
+                'unique:products,barcode',
+            ],
+
             'category_id' => [
                 'required',
                 'integer',
@@ -81,6 +88,7 @@ class StoreProductRequest extends FormRequest
             'name.required' => 'O nome do produto é obrigatório.',
             'code.required' => 'O código do produto é obrigatório.',
             'code.unique' => 'Já existe um produto com esse código.',
+            'barcode.unique' => 'Já existe um produto com esse código de barras.',
             'category_id.required' => 'A categoria é obrigatória.',
             'category_id.exists' => 'A categoria informada não existe.',
             'supplier_id.exists' => 'O fornecedor informado não existe.',
