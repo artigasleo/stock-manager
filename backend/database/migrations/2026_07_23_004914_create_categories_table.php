@@ -9,20 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-public function up(): void
-{
-    Schema::create('categories', function (Blueprint $table) {
-        $table->id();
+    public function up(): void
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
 
-        $table->string('name', 100)->unique();
+            $table->string('name', 100)->unique();
 
-        $table->boolean('active')->default(true);
+            $table->boolean('active')->default(true);
 
-        $table->softDeletes();
+            $table->softDeletes();
 
-        $table->timestamps();
-    });
-}
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

@@ -2,8 +2,8 @@
 
 namespace App\Actions\User;
 
-use Illuminate\Database\Eloquent\Collection;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class ListUser
 {

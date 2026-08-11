@@ -10,7 +10,7 @@ class CreateCategory
     public function execute(StoreCategoryRequest $request): Category
     {
         return Category::create([
-            'name'   => $request->validated('name'),
+            'name' => $request->validated('name'),
             'active' => $request->validated('active') ?? true,
         ]);
     }
