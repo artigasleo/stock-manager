@@ -6,11 +6,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['unit_id', 'product_id', 'user_id', 'type', 'quantity', 'reason'])]
-class StockMovement extends Model
+#[Fillable(['unit_id', 'product_id', 'quantity', 'min_stock'])]
+class ProductStock extends Model
 {
-    const UPDATED_AT = null;
-
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
@@ -19,10 +17,5 @@ class StockMovement extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 }

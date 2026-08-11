@@ -2,7 +2,7 @@
 
 @section('content')
     @php
-        $lowStockCount = $lowStockProducts->count();
+        $lowStockCount = $lowStockStocks->count();
     @endphp
 
     <h1 class="text-2xl font-semibold text-brand-dark mb-4">Dashboard</h1>
@@ -54,11 +54,11 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
-                    @forelse ($lowStockProducts as $product)
+                    @forelse ($lowStockStocks as $stock)
                         <tr>
-                            <td class="px-4 py-2">{{ $product->name }}</td>
-                            <td class="px-4 py-2 text-red-700 font-medium">{{ $product->quantity }}</td>
-                            <td class="px-4 py-2">{{ $product->min_stock }}</td>
+                            <td class="px-4 py-2">{{ $stock->product->name }}</td>
+                            <td class="px-4 py-2 text-red-700 font-medium">{{ $stock->quantity }}</td>
+                            <td class="px-4 py-2">{{ $stock->min_stock }}</td>
                         </tr>
                     @empty
                         <tr>

@@ -49,12 +49,6 @@ class UpdateProductRequest extends FormRequest
                 'exists:suppliers,id',
             ],
 
-            'quantity' => [
-                'sometimes',
-                'integer',
-                'min:0',
-            ],
-
             'min_stock' => [
                 'sometimes',
                 'integer',

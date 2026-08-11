@@ -6,6 +6,7 @@ use App\Actions\Stock\CreateStockMovement;
 use App\Http\Requests\Purchase\StorePurchaseRequest;
 use App\Models\Product;
 use App\Models\Purchase;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -15,12 +16,13 @@ class CreatePurchase
         private CreateStockMovement $createStockMovement
     ) {}
 
-    public function execute(StorePurchaseRequest $request, User $user): Purchase
+    public function execute(StorePurchaseRequest $request, Unit $unit, User $user): Purchase
     {
-        return DB::transaction(function () use ($request, $user) {
+        return DB::transaction(function () use ($request, $unit, $user) {
             $items = $request->validated('items');
 
             $purchase = Purchase::create([
+                'unit_id' => $unit->id,
                 'supplier_id' => $request->validated('supplier_id'),
                 'user_id' => $user->id,
                 'invoice_number' => $request->validated('invoice_number'),
@@ -35,6 +37,7 @@ class CreatePurchase
                 ]);
 
                 $this->createStockMovement->execute(
+                    $unit->id,
                     $item['product_id'],
                     'in',
                     $item['quantity'],

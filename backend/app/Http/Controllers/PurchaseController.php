@@ -9,6 +9,7 @@ use App\Http\Requests\Purchase\ImportNfeRequest;
 use App\Http\Requests\Purchase\StorePurchaseRequest;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use InvalidArgumentException;
@@ -28,7 +29,7 @@ class PurchaseController extends Controller
         StorePurchaseRequest $request,
         CreatePurchase $action
     ): RedirectResponse {
-        $action->execute($request, $request->user());
+        $action->execute($request, Unit::default(), $request->user());
 
         return redirect()->route('purchases.index')->with('success', 'Compra registrada.');
     }

@@ -29,6 +29,7 @@ class UpdateSaleStatus
             if ($newStatus === 'cancelled') {
                 foreach ($sale->items as $item) {
                     $this->createStockMovement->execute(
+                        $sale->unit_id,
                         $item->product_id,
                         'in',
                         $item->quantity,

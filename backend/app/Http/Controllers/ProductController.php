@@ -11,6 +11,7 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Supplier;
+use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -19,7 +20,7 @@ class ProductController extends Controller
     public function index(ListProduct $action): View
     {
         return view('products.index', [
-            'products' => $action->execute(),
+            'products' => $action->execute(Unit::default()),
             'categories' => Category::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
         ]);
@@ -29,7 +30,7 @@ class ProductController extends Controller
         StoreProductRequest $request,
         CreateProduct $action
     ): RedirectResponse {
-        $action->execute($request);
+        $action->execute($request, Unit::default(), $request->user());
 
         return redirect()->route('products.index')->with('success', 'Produto criado.');
     }
@@ -39,7 +40,7 @@ class ProductController extends Controller
         Product $product,
         UpdateProduct $action
     ): RedirectResponse {
-        $action->execute($request, $product);
+        $action->execute($request, $product, Unit::default());
 
         return redirect()->route('products.index')->with('success', 'Produto atualizado.');
     }

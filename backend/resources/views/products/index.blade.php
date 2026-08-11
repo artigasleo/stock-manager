@@ -44,7 +44,7 @@
                             <td class="px-4 py-3">{{ $product->name }}</td>
                             <td class="px-4 py-3">{{ $product->category->name }}</td>
                             <td class="px-4 py-3">{{ $product->supplier?->name ?? '—' }}</td>
-                            <td class="px-4 py-3">{{ $product->quantity }}</td>
+                            <td class="px-4 py-3">{{ $product->stocks->first()?->quantity ?? 0 }}</td>
                             <td class="px-4 py-3">{{ number_format($product->sale_price, 2, ',', '.') }}</td>
                             <td class="px-4 py-3">
                                 <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $product->active ? 'bg-green-100 text-green-800' : 'bg-stone-200 text-stone-600' }}">
@@ -185,18 +185,19 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Quantidade</label>
+                        <div x-show="!editing">
+                            <label class="block text-sm font-medium mb-1">Quantidade inicial</label>
                             <input
                                 type="number"
                                 min="0"
                                 name="quantity"
-                                :value="editing && editing.quantity !== undefined ? editing.quantity : '{{ old('quantity', 0) }}'"
+                                :value="old('quantity', 0)"
                                 class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
                             @error('quantity')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                            <p class="mt-1 text-xs text-stone-500">Gera uma movimentação de entrada ao criar o produto.</p>
                         </div>
 
                         <div>
@@ -205,7 +206,7 @@
                                 type="number"
                                 min="0"
                                 name="min_stock"
-                                :value="editing && editing.min_stock !== undefined ? editing.min_stock : '{{ old('min_stock', 0) }}'"
+                                :value="editing && editing.stocks && editing.stocks[0] ? editing.stocks[0].min_stock : '{{ old('min_stock', 0) }}'"
                                 class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
                             @error('min_stock')

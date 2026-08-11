@@ -15,8 +15,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'barcode',
     'category_id',
     'supplier_id',
-    'quantity',
-    'min_stock',
     'expiration_date',
     'cost_price',
     'sale_price',
@@ -49,5 +47,10 @@ class Product extends Model
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(ProductStock::class);
     }
 }

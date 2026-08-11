@@ -87,7 +87,7 @@
                             <option value="" disabled @selected(!old('product_id'))>Selecione...</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" @selected(old('product_id') == $product->id)>
-                                    {{ $product->name }} (atual: {{ $product->quantity }})
+                                    {{ $product->name }} (atual: {{ $product->stocks->first()?->quantity ?? 0 }})
                                 </option>
                             @endforeach
                         </select>

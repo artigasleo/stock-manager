@@ -10,6 +10,7 @@ use App\Http\Requests\Sale\UpdateSaleStatusRequest;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -17,10 +18,14 @@ class SaleController extends Controller
 {
     public function index(ListSale $action): View
     {
+        $unit = Unit::default();
+
         return view('sales.index', [
             'sales' => $action->execute(),
             'customers' => Customer::orderBy('name')->get(),
-            'products' => Product::orderBy('name')->get(),
+            'products' => Product::with(['stocks' => fn ($query) => $query->where('unit_id', $unit->id)])
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 
@@ -28,7 +33,7 @@ class SaleController extends Controller
         StoreSaleRequest $request,
         CreateSale $action
     ): RedirectResponse {
-        $action->execute($request, $request->user());
+        $action->execute($request, Unit::default(), $request->user());
 
         return redirect()->route('sales.index')->with('success', 'Venda registrada.');
     }

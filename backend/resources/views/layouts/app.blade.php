@@ -40,6 +40,7 @@
                         ['label' => 'Estoque', 'route' => 'stock.index'],
                         ['label' => 'Compras', 'route' => 'purchases.index'],
                         ['label' => 'Vendas', 'route' => 'sales.index'],
+                        ['label' => 'Unidades', 'route' => 'units.index'],
                     ];
                 @endphp
 

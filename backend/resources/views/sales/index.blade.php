@@ -247,7 +247,7 @@
                                     >
                                         <option value="">Selecione...</option>
                                         @foreach ($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }} (disp.: {{ $product->quantity }})</option>
+                                            <option value="{{ $product->id }}">{{ $product->name }} (disp.: {{ $product->stocks->first()?->quantity ?? 0 }})</option>
                                         @endforeach
                                     </select>
 
