@@ -36,6 +36,7 @@
                         ['label' => 'Categorias', 'route' => 'categories.index'],
                         ['label' => 'Produtos', 'route' => 'products.index'],
                         ['label' => 'Fornecedores', 'route' => 'suppliers.index'],
+                        ['label' => 'Clientes', 'route' => 'customers.index'],
                         ['label' => 'Estoque', 'route' => 'stock.index'],
                         ['label' => 'Compras', 'route' => 'purchases.index'],
                     ];
