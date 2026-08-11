@@ -25,7 +25,13 @@ class StockMovementController extends Controller
         StoreStockMovementRequest $request,
         CreateStockMovement $action
     ): RedirectResponse {
-        $action->execute($request, $request->user());
+        $action->execute(
+            $request->validated('product_id'),
+            $request->validated('type'),
+            $request->validated('quantity'),
+            $request->validated('reason'),
+            $request->user(),
+        );
 
         return redirect()->route('stock.index')->with('success', 'Movimentação registrada.');
     }

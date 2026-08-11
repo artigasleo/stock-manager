@@ -37,6 +37,7 @@
                         ['label' => 'Produtos', 'route' => 'products.index'],
                         ['label' => 'Fornecedores', 'route' => 'suppliers.index'],
                         ['label' => 'Estoque', 'route' => 'stock.index'],
+                        ['label' => 'Compras', 'route' => 'purchases.index'],
                     ];
                 @endphp
 
