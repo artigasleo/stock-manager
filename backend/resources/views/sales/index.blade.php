@@ -37,6 +37,14 @@
                     item.unit_price = this.productPrices[item.product_id] ?? '';
                 }
             },
+            itemSubtotal(item) {
+                return (Number(item.quantity || 0) * Number(item.unit_price || 0)).toFixed(2);
+            },
+            cartTotal() {
+                return this.items
+                    .reduce((sum, item) => sum + (Number(item.quantity || 0) * Number(item.unit_price || 0)), 0)
+                    .toFixed(2);
+            },
             addByBarcode(rawCode) {
                 const barcode = rawCode.trim();
                 if (!barcode) return;
@@ -216,7 +224,7 @@
                                         :name="`items[${index}][product_id]`"
                                         x-model="item.product_id"
                                         @change="fillPrice(item)"
-                                        class="col-span-6 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        class="col-span-4 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
                                         <option value="">Selecione...</option>
                                         @foreach ($products as $product)
@@ -240,8 +248,10 @@
                                         placeholder="Preço unit."
                                         :name="`items[${index}][unit_price]`"
                                         x-model="item.unit_price"
-                                        class="col-span-3 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        class="col-span-2 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
+
+                                    <span class="col-span-3 text-sm text-right pr-2 text-stone-700" x-text="'R$ ' + itemSubtotal(item)"></span>
 
                                     <button
                                         type="button"
@@ -252,6 +262,12 @@
                                     </button>
                                 </div>
                             </template>
+                        </div>
+
+                        <div class="flex justify-end mt-2 pt-2 border-t border-stone-200">
+                            <span class="text-sm font-semibold text-brand-dark">
+                                Total: R$ <span x-text="cartTotal()"></span>
+                            </span>
                         </div>
                     </div>
 
