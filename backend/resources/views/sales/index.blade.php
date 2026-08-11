@@ -57,6 +57,13 @@
                     .reduce((sum, item) => sum + (Number(item.quantity || 0) * Number(item.unit_price || 0)), 0)
                     .toFixed(2);
             },
+            removeItem(index) {
+                if (this.items.length > 1) {
+                    this.items.splice(index, 1);
+                } else {
+                    this.items[0] = { product_id: '', quantity: 1, unit_price: '' };
+                }
+            },
             addByBarcode(rawCode) {
                 const code = rawCode.trim();
                 if (!code) return;
@@ -267,7 +274,7 @@
 
                                     <button
                                         type="button"
-                                        @click="items.length > 1 ? items.splice(index, 1) : null"
+                                        @click="removeItem(index)"
                                         class="col-span-1 text-red-600 hover:underline cursor-pointer text-sm"
                                     >
                                         Remover

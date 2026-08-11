@@ -5,6 +5,13 @@
         x-data="{
             modalOpen: {{ $errors->any() || old('items') ? 'true' : 'false' }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_cost: '' }]" }},
+            removeItem(index) {
+                if (this.items.length > 1) {
+                    this.items.splice(index, 1);
+                } else {
+                    this.items[0] = { product_id: '', quantity: 1, unit_cost: '' };
+                }
+            },
         }"
     >
         <div class="flex items-center justify-between mb-4">
@@ -170,7 +177,7 @@
 
                                     <button
                                         type="button"
-                                        @click="items.length > 1 ? items.splice(index, 1) : null"
+                                        @click="removeItem(index)"
                                         class="col-span-1 text-red-600 hover:underline cursor-pointer text-sm"
                                     >
                                         Remover
