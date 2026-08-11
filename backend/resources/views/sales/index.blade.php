@@ -22,6 +22,18 @@
         'credit_card' => 'Cartão de Crédito',
         'other' => 'Outro',
     ];
+
+    // Aceita tanto o código de barras quanto o código interno do produto -
+    // muitos produtos ainda não têm código de barras cadastrado.
+    $productIdentifiers = $products->reduce(function (array $map, $product) {
+        $map[$product->code] = $product->id;
+
+        if ($product->barcode) {
+            $map[$product->barcode] = $product->id;
+        }
+
+        return $map;
+    }, []);
 @endphp
 
 @section('content')
@@ -30,7 +42,7 @@
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '' }]" }},
             barcodeError: '',
-            productsByBarcode: @js($products->filter(fn ($p) => $p->barcode)->pluck('id', 'barcode')),
+            productsByIdentifier: @js($productIdentifiers),
             productPrices: @js($products->pluck('sale_price', 'id')),
             fillPrice(item) {
                 if (!item.unit_price && item.product_id) {
@@ -46,13 +58,13 @@
                     .toFixed(2);
             },
             addByBarcode(rawCode) {
-                const barcode = rawCode.trim();
-                if (!barcode) return;
+                const code = rawCode.trim();
+                if (!code) return;
 
-                const productId = this.productsByBarcode[barcode];
+                const productId = this.productsByIdentifier[code];
 
                 if (!productId) {
-                    this.barcodeError = 'Nenhum produto encontrado com o código de barras ' + barcode + '.';
+                    this.barcodeError = 'Nenhum produto encontrado com o código ' + code + '.';
                     return;
                 }
 
@@ -195,10 +207,10 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Código de barras</label>
+                        <label class="block text-sm font-medium mb-1">Código de barras ou código do produto</label>
                         <input
                             type="text"
-                            placeholder="Bipe ou digite o código e pressione Enter"
+                            placeholder="Bipe o código de barras ou digite o código do produto e pressione Enter"
                             @keydown.enter.prevent="addByBarcode($event.target.value); $event.target.value = ''"
                             class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                         >
