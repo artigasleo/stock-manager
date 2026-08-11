@@ -3,21 +3,40 @@
 @section('content')
     <div
         x-data="{
-            modalOpen: {{ $errors->any() ? 'true' : 'false' }},
+            modalOpen: {{ $errors->any() || old('items') ? 'true' : 'false' }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_cost: '' }]" }},
         }"
     >
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-semibold text-brand-dark">Compras</h1>
 
-            <button
-                type="button"
-                @click="modalOpen = true"
-                class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
-            >
-                Nova compra
-            </button>
+            <div class="flex items-center gap-3">
+                <form method="POST" action="{{ route('purchases.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                    @csrf
+                    <input
+                        type="file"
+                        name="xml_file"
+                        accept=".xml"
+                        required
+                        class="text-sm rounded-md border border-stone-300 px-2 py-1.5 bg-white"
+                    >
+                    <button type="submit" class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer">
+                        Importar XML
+                    </button>
+                </form>
+
+                <button
+                    type="button"
+                    @click="modalOpen = true"
+                    class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
+                >
+                    Nova compra
+                </button>
+            </div>
         </div>
+        @error('xml_file')
+            <p class="mb-4 text-sm text-red-600">{{ $message }}</p>
+        @enderror
 
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
             <table class="w-full text-sm">

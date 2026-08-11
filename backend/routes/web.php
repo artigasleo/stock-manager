@@ -24,4 +24,5 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('stock', StockMovementController::class)->only(['index', 'store']);
     Route::resource('purchases', PurchaseController::class)->only(['index', 'store']);
+    Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
 });

@@ -62,6 +62,18 @@
                     </div>
                 @endif
 
+                @if (session('warning'))
+                    <div class="mb-4 rounded-md bg-amber-50 border border-amber-200 text-amber-800 px-4 py-3 text-sm">
+                        {{ session('warning') }}
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 @yield('content')
             </main>
         </div>
