@@ -39,6 +39,7 @@
                         ['label' => 'Clientes', 'route' => 'customers.index'],
                         ['label' => 'Estoque', 'route' => 'stock.index'],
                         ['label' => 'Compras', 'route' => 'purchases.index'],
+                        ['label' => 'Vendas', 'route' => 'sales.index'],
                     ];
                 @endphp
 

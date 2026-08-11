@@ -6,6 +6,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\SaleController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -27,4 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('stock', StockMovementController::class)->only(['index', 'store']);
     Route::resource('purchases', PurchaseController::class)->only(['index', 'store']);
     Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
+
+    Route::resource('sales', SaleController::class)->only(['index', 'store']);
+    Route::patch('/sales/{sale}/status', [SaleController::class, 'updateStatus'])->name('sales.updateStatus');
 });
