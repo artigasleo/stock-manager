@@ -42,7 +42,7 @@
                             <td class="px-4 py-3">
                                 <button
                                     type="button"
-                                    @click="editing = @json($category); modalOpen = true"
+                                    @click="editing = @js($category); modalOpen = true"
                                     class="text-brand hover:underline cursor-pointer mr-3"
                                 >
                                     Editar
