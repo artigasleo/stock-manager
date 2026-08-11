@@ -34,16 +34,30 @@
 
         return $map;
     }, []);
+
+    // Quantidade disponível por unidade, pra atualizar a dica "disp.: X" quando
+    // o usuário trocar a unidade da venda.
+    $stocksByUnit = [];
+    foreach ($products as $product) {
+        foreach ($product->stocks as $stock) {
+            $stocksByUnit[$stock->unit_id][$product->id] = $stock->quantity;
+        }
+    }
 @endphp
 
 @section('content')
     <div
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
+            unitId: {{ old('unit_id', $defaultUnit->id) }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '' }]" }},
             barcodeError: '',
             productsByIdentifier: @js($productIdentifiers),
             productPrices: @js($products->pluck('sale_price', 'id')),
+            stocksByUnit: @js($stocksByUnit),
+            availableQuantity(productId) {
+                return this.stocksByUnit[this.unitId]?.[productId] ?? 0;
+            },
             fillPrice(item) {
                 if (!item.unit_price && item.product_id) {
                     item.unit_price = this.productPrices[item.product_id] ?? '';
@@ -183,7 +197,22 @@
                 <form method="POST" action="{{ route('sales.store') }}" class="space-y-4">
                     @csrf
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Unidade</label>
+                            <select
+                                name="unit_id"
+                                x-model.number="unitId"
+                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}" @selected(old('unit_id', $defaultUnit->id) == $unit->id)>
+                                        {{ $unit->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium mb-1">Cliente (opcional)</label>
                             <select
@@ -247,18 +276,25 @@
                                     >
                                         <option value="">Selecione...</option>
                                         @foreach ($products as $product)
-                                            <option value="{{ $product->id }}">{{ $product->name }} (disp.: {{ $product->stocks->first()?->quantity ?? 0 }})</option>
+                                            <option value="{{ $product->id }}">{{ $product->name }}</option>
                                         @endforeach
                                     </select>
 
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        placeholder="Qtd."
-                                        :name="`items[${index}][quantity]`"
-                                        x-model="item.quantity"
-                                        class="col-span-2 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                                    >
+                                    <div class="col-span-2">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            placeholder="Qtd."
+                                            :name="`items[${index}][quantity]`"
+                                            x-model="item.quantity"
+                                            class="w-full rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        >
+                                        <p
+                                            x-show="item.product_id"
+                                            x-text="'disp.: ' + availableQuantity(item.product_id)"
+                                            class="mt-0.5 text-xs text-stone-500"
+                                        ></p>
+                                    </div>
 
                                     <input
                                         type="number"

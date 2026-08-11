@@ -18,14 +18,12 @@ class SaleController extends Controller
 {
     public function index(ListSale $action): View
     {
-        $unit = Unit::default();
-
         return view('sales.index', [
             'sales' => $action->execute(),
             'customers' => Customer::orderBy('name')->get(),
-            'products' => Product::with(['stocks' => fn ($query) => $query->where('unit_id', $unit->id)])
-                ->orderBy('name')
-                ->get(),
+            'products' => Product::with('stocks')->orderBy('name')->get(),
+            'units' => Unit::where('active', true)->orderBy('name')->get(),
+            'defaultUnit' => Unit::default(),
         ]);
     }
 
@@ -33,7 +31,9 @@ class SaleController extends Controller
         StoreSaleRequest $request,
         CreateSale $action
     ): RedirectResponse {
-        $action->execute($request, Unit::default(), $request->user());
+        $unit = Unit::findOrFail($request->validated('unit_id'));
+
+        $action->execute($request, $unit, $request->user());
 
         return redirect()->route('sales.index')->with('success', 'Venda registrada.');
     }

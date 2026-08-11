@@ -14,6 +14,12 @@ class StoreSaleRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'unit_id' => [
+                'required',
+                'integer',
+                'exists:units,id',
+            ],
+
             'customer_id' => [
                 'nullable',
                 'integer',
@@ -56,6 +62,8 @@ class StoreSaleRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'unit_id.required' => 'A unidade é obrigatória.',
+            'unit_id.exists' => 'A unidade informada não existe.',
             'customer_id.exists' => 'O cliente informado não existe.',
             'payment_method.in' => 'Forma de pagamento inválida.',
             'items.required' => 'Adicione ao menos um item.',

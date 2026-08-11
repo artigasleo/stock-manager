@@ -22,6 +22,8 @@ class PurchaseController extends Controller
             'purchases' => $action->execute(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
+            'units' => Unit::where('active', true)->orderBy('name')->get(),
+            'defaultUnit' => Unit::default(),
         ]);
     }
 
@@ -29,7 +31,9 @@ class PurchaseController extends Controller
         StorePurchaseRequest $request,
         CreatePurchase $action
     ): RedirectResponse {
-        $action->execute($request, Unit::default(), $request->user());
+        $unit = Unit::findOrFail($request->validated('unit_id'));
+
+        $action->execute($request, $unit, $request->user());
 
         return redirect()->route('purchases.index')->with('success', 'Compra registrada.');
     }

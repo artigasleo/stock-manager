@@ -15,13 +15,11 @@ class StockMovementController extends Controller
 {
     public function index(Request $request, ListStockMovement $action): View
     {
-        $unit = Unit::default();
-
         return view('stock.index', [
             'movements' => $action->execute($request->integer('product_id') ?: null),
-            'products' => Product::with(['stocks' => fn ($query) => $query->where('unit_id', $unit->id)])
-                ->orderBy('name')
-                ->get(),
+            'products' => Product::with('stocks')->orderBy('name')->get(),
+            'units' => Unit::where('active', true)->orderBy('name')->get(),
+            'defaultUnit' => Unit::default(),
             'selectedProductId' => $request->integer('product_id') ?: null,
         ]);
     }
@@ -30,10 +28,8 @@ class StockMovementController extends Controller
         StoreStockMovementRequest $request,
         CreateStockMovement $action
     ): RedirectResponse {
-        $unit = Unit::default();
-
         $action->execute(
-            $unit->id,
+            $request->validated('unit_id'),
             $request->validated('product_id'),
             $request->validated('type'),
             $request->validated('quantity'),

@@ -100,7 +100,21 @@
                 <form method="POST" action="{{ route('purchases.store') }}" class="space-y-4">
                     @csrf
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Unidade</label>
+                            <select
+                                name="unit_id"
+                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                                @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}" @selected(old('unit_id', $defaultUnit->id) == $unit->id)>
+                                        {{ $unit->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <div>
                             <label class="block text-sm font-medium mb-1">Fornecedor</label>
                             <select

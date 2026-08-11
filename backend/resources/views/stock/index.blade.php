@@ -1,7 +1,28 @@
 @extends('layouts.app')
 
+@php
+    // Quantidade disponível por unidade, pra atualizar a dica "estoque atual" quando
+    // o usuário trocar a unidade da movimentação.
+    $stocksByUnit = [];
+    foreach ($products as $product) {
+        foreach ($product->stocks as $stock) {
+            $stocksByUnit[$stock->unit_id][$product->id] = $stock->quantity;
+        }
+    }
+@endphp
+
 @section('content')
-    <div x-data="{ modalOpen: {{ $errors->any() ? 'true' : 'false' }} }">
+    <div
+        x-data="{
+            modalOpen: {{ $errors->any() ? 'true' : 'false' }},
+            unitId: {{ old('unit_id', $defaultUnit->id) }},
+            productId: '{{ old('product_id') }}',
+            stocksByUnit: @js($stocksByUnit),
+            availableQuantity() {
+                return this.stocksByUnit[this.unitId]?.[this.productId] ?? 0;
+            },
+        }"
+    >
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-semibold text-brand-dark">Estoque</h1>
 
@@ -79,18 +100,35 @@
                     @csrf
 
                     <div>
+                        <label class="block text-sm font-medium mb-1">Unidade</label>
+                        <select
+                            name="unit_id"
+                            x-model.number="unitId"
+                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                        >
+                            @foreach ($units as $unit)
+                                <option value="{{ $unit->id }}" @selected(old('unit_id', $defaultUnit->id) == $unit->id)>
+                                    {{ $unit->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium mb-1">Produto</label>
                         <select
                             name="product_id"
+                            x-model="productId"
                             class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                         >
                             <option value="" disabled @selected(!old('product_id'))>Selecione...</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}" @selected(old('product_id') == $product->id)>
-                                    {{ $product->name }} (atual: {{ $product->stocks->first()?->quantity ?? 0 }})
+                                    {{ $product->name }}
                                 </option>
                             @endforeach
                         </select>
+                        <p x-show="productId" x-text="'Estoque atual: ' + availableQuantity()" class="mt-1 text-xs text-stone-500"></p>
                         @error('product_id')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror

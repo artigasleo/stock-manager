@@ -14,6 +14,12 @@ class StorePurchaseRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'unit_id' => [
+                'required',
+                'integer',
+                'exists:units,id',
+            ],
+
             'supplier_id' => [
                 'required',
                 'integer',
@@ -56,6 +62,8 @@ class StorePurchaseRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'unit_id.required' => 'A unidade é obrigatória.',
+            'unit_id.exists' => 'A unidade informada não existe.',
             'supplier_id.required' => 'O fornecedor é obrigatório.',
             'supplier_id.exists' => 'O fornecedor informado não existe.',
             'items.required' => 'Adicione ao menos um item.',

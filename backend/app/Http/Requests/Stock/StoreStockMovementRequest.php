@@ -14,6 +14,12 @@ class StoreStockMovementRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'unit_id' => [
+                'required',
+                'integer',
+                'exists:units,id',
+            ],
+
             'product_id' => [
                 'required',
                 'integer',
@@ -43,6 +49,8 @@ class StoreStockMovementRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'unit_id.required' => 'A unidade é obrigatória.',
+            'unit_id.exists' => 'A unidade informada não existe.',
             'product_id.required' => 'O produto é obrigatório.',
             'product_id.exists' => 'O produto informado não existe.',
             'type.required' => 'O tipo de movimentação é obrigatório.',
