@@ -40,11 +40,24 @@ class GenerateSalesReport
             ->orderByDesc('period')
             ->limit($limit)
             ->get()
-            ->map(fn ($row) => (object) [
-                'label' => $label(Carbon::parse($row->period)),
-                'count' => (int) $row->count,
-                'total' => (float) $row->total,
-            ]);
+            ->map(function ($row) use ($unit, $label) {
+                $start = Carbon::parse($row->period);
+
+                $end = match ($unit) {
+                    'day' => $start->copy()->endOfDay(),
+                    'month' => $start->copy()->endOfMonth(),
+                    'quarter' => $start->copy()->endOfQuarter(),
+                    'year' => $start->copy()->endOfYear(),
+                };
+
+                return (object) [
+                    'label' => $label($start),
+                    'count' => (int) $row->count,
+                    'total' => (float) $row->total,
+                    'start' => $start,
+                    'end' => $end,
+                ];
+            });
     }
 
     private function semesters(int $limit): Collection
@@ -56,10 +69,18 @@ class GenerateSalesReport
             ->orderByDesc('semester')
             ->limit($limit)
             ->get()
-            ->map(fn ($row) => (object) [
-                'label' => (int) $row->semester.'º Semestre/'.(int) $row->year,
-                'count' => (int) $row->count,
-                'total' => (float) $row->total,
-            ]);
+            ->map(function ($row) {
+                $year = (int) $row->year;
+                $semester = (int) $row->semester;
+                $start = Carbon::create($year, $semester === 1 ? 1 : 7, 1)->startOfDay();
+
+                return (object) [
+                    'label' => $semester.'º Semestre/'.$year,
+                    'count' => (int) $row->count,
+                    'total' => (float) $row->total,
+                    'start' => $start,
+                    'end' => $start->copy()->addMonths(6)->subSecond(),
+                ];
+            });
     }
 }

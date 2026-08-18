@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Actions\Report\GenerateSalesReport;
+use App\Models\Sale;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -47,6 +50,26 @@ class ReportController extends Controller implements HasMiddleware
 
             fclose($handle);
         }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function detail(Request $request): View
+    {
+        try {
+            $from = Carbon::parse($request->query('from'));
+            $to = Carbon::parse($request->query('to'));
+        } catch (Exception) {
+            abort(400, 'Período inválido.');
+        }
+
+        return view('reports.detail', [
+            'sales' => Sale::where('status', '!=', 'cancelled')
+                ->whereBetween('created_at', [$from, $to])
+                ->with(['customer', 'user'])
+                ->orderBy('created_at')
+                ->get(),
+            'label' => $request->string('label')->value(),
+            'granularity' => $this->granularity($request),
+        ]);
     }
 
     private function granularity(Request $request): string
