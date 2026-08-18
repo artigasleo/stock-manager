@@ -25,9 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('customers', CustomerController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::resource('products', ProductController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('estoque', ProductController::class)
+        ->names('products')
+        ->parameters(['estoque' => 'product'])
+        ->only(['index', 'store', 'update', 'destroy']);
 
-    Route::resource('stock', StockMovementController::class)->only(['index', 'store']);
+    Route::resource('movimentacoes', StockMovementController::class)
+        ->names('stock')
+        ->only(['index', 'store']);
     Route::resource('purchases', PurchaseController::class)->only(['index', 'store']);
     Route::post('/purchases/import', [PurchaseController::class, 'import'])->name('purchases.import');
 

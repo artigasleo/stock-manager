@@ -10,7 +10,7 @@
         }"
     >
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-semibold text-brand-dark">Produtos</h1>
+            <h1 class="text-2xl font-semibold text-brand-dark">Estoque</h1>
 
             <button
                 type="button"
@@ -96,7 +96,7 @@
 
                 <form
                     method="POST"
-                    :action="editing ? `/products/${editing.id}` : '{{ route('products.store') }}'"
+                    :action="editing ? `/estoque/${editing.id}` : '{{ route('products.store') }}'"
                     class="space-y-4"
                 >
                     @csrf

@@ -19,7 +19,7 @@ class ProductController extends Controller
 {
     public function index(ListProduct $action): View
     {
-        return view('products.index', [
+        return view('estoque.index', [
             'products' => $action->execute(Unit::default()),
             'categories' => Category::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),

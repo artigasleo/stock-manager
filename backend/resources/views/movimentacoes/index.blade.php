@@ -24,7 +24,7 @@
         }"
     >
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-semibold text-brand-dark">Estoque</h1>
+            <h1 class="text-2xl font-semibold text-brand-dark">Movimentações</h1>
 
             <button
                 type="button"

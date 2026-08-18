@@ -15,7 +15,7 @@ class StockMovementController extends Controller
 {
     public function index(Request $request, ListStockMovement $action): View
     {
-        return view('stock.index', [
+        return view('movimentacoes.index', [
             'movements' => $action->execute($request->integer('product_id') ?: null),
             'products' => Product::with('stocks')->orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
