@@ -6,6 +6,7 @@ use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Models\Unit;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
@@ -19,8 +20,10 @@ class DashboardController extends Controller implements HasMiddleware
         ];
     }
 
-    public function __invoke(): View
+    public function __invoke(Request $request): View
     {
+        $period = $request->string('period')->value() === 'day' ? 'day' : 'month';
+
         $unit = Unit::default();
 
         $activeSales = Sale::where('status', '!=', 'cancelled');
@@ -40,7 +43,9 @@ class DashboardController extends Controller implements HasMiddleware
         $stockValue = (clone $activeStocks)->get()
             ->sum(fn (ProductStock $stock) => $stock->quantity * $stock->product->cost_price);
 
-        $paymentMethodBreakdown = (clone $salesMonth)
+        $salesForPeriod = $period === 'day' ? $salesToday : $salesMonth;
+
+        $paymentMethodBreakdown = (clone $salesForPeriod)
             ->selectRaw('payment_method, count(*) as count, sum(total) as total')
             ->groupBy('payment_method')
             ->orderByDesc('total')
@@ -53,6 +58,7 @@ class DashboardController extends Controller implements HasMiddleware
             'salesMonthTotal' => $salesMonth->sum('total'),
             'lowStockStocks' => $lowStockStocks,
             'stockValue' => $stockValue,
+            'period' => $period,
             'paymentMethodBreakdown' => $paymentMethodBreakdown,
             'recentMovements' => StockMovement::with('product')->latest()->limit(8)->get(),
         ]);

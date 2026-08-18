@@ -80,8 +80,23 @@
         </div>
 
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
-            <div class="px-4 py-3 border-b border-stone-200">
-                <h2 class="font-semibold text-brand-dark">Formas de pagamento (mês)</h2>
+            <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
+                <h2 class="font-semibold text-brand-dark">Formas de pagamento</h2>
+
+                <div class="flex rounded-md border border-stone-300 overflow-hidden text-xs">
+                    <a
+                        href="{{ route('dashboard', ['period' => 'day']) }}"
+                        class="px-3 py-1 {{ $period === 'day' ? 'bg-brand text-brand-cream' : 'bg-white text-stone-600 hover:bg-stone-100' }}"
+                    >
+                        Dia
+                    </a>
+                    <a
+                        href="{{ route('dashboard', ['period' => 'month']) }}"
+                        class="px-3 py-1 {{ $period === 'month' ? 'bg-brand text-brand-cream' : 'bg-white text-stone-600 hover:bg-stone-100' }}"
+                    >
+                        Mês
+                    </a>
+                </div>
             </div>
 
             <table class="w-full text-sm">
@@ -102,7 +117,7 @@
                     @empty
                         <tr>
                             <td colspan="3" class="px-4 py-6 text-center text-stone-500">
-                                Nenhuma venda registrada no mês.
+                                Nenhuma venda registrada {{ $period === 'day' ? 'hoje' : 'no mês' }}.
                             </td>
                         </tr>
                     @endforelse
