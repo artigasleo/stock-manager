@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Report\GenerateSalesReport;
 use App\Models\Sale;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,6 +16,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class ReportController extends Controller implements HasMiddleware
 {
     private const GRANULARITIES = ['day', 'month', 'quarter', 'semester', 'year'];
+
+    private const PAYMENT_LABELS = [
+        'cash' => 'Dinheiro',
+        'pix' => 'PIX',
+        'debit_card' => 'Cartão de Débito',
+        'credit_card' => 'Cartão de Crédito',
+        'other' => 'Outro',
+    ];
+
+    private const STATUS_LABELS = [
+        'awaiting_payment' => 'Aguardando Pagamento',
+        'paid' => 'Paga',
+        'invoiced' => 'Faturada',
+        'cancelled' => 'Cancelada',
+    ];
 
     public static function middleware(): array
     {
@@ -70,6 +86,66 @@ class ReportController extends Controller implements HasMiddleware
             'label' => $request->string('label')->value(),
             'granularity' => $this->granularity($request),
         ]);
+    }
+
+    public function salesIndex(Request $request): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return view('reports.sales', [
+            'sales' => $this->salesBetween($from, $to),
+            'from' => $from->format('Y-m-d'),
+            'to' => $to->format('Y-m-d'),
+            'paymentLabels' => self::PAYMENT_LABELS,
+            'statusLabels' => self::STATUS_LABELS,
+        ]);
+    }
+
+    public function salesExport(Request $request): StreamedResponse
+    {
+        [$from, $to] = $this->dateRange($request);
+        $sales = $this->salesBetween($from, $to);
+
+        $filename = 'vendas-'.$from->format('Y-m-d').'-a-'.$to->format('Y-m-d').'.csv';
+
+        return response()->streamDownload(function () use ($sales) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Data/Hora', 'Produto(s)', 'Forma de pagamento', 'Vendedor', 'Cliente', 'Status', 'Total (R$)'], ';');
+
+            foreach ($sales as $sale) {
+                fputcsv($handle, [
+                    $sale->created_at->format('d/m/Y H:i'),
+                    $sale->items->map(fn ($item) => $item->product->name.' (x'.$item->quantity.')')->implode(', '),
+                    self::PAYMENT_LABELS[$sale->payment_method] ?? 'Não informado',
+                    $sale->user->name,
+                    $sale->customer?->name ?? 'Não identificado',
+                    self::STATUS_LABELS[$sale->status] ?? $sale->status,
+                    number_format($sale->total, 2, ',', '.'),
+                ], ';');
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    private function dateRange(Request $request): array
+    {
+        try {
+            $from = Carbon::parse($request->query('from', now()->startOfMonth()->format('Y-m-d')))->startOfDay();
+            $to = Carbon::parse($request->query('to', now()->format('Y-m-d')))->endOfDay();
+        } catch (Exception) {
+            abort(400, 'Período inválido.');
+        }
+
+        return [$from, $to];
+    }
+
+    private function salesBetween(Carbon $from, Carbon $to): Collection
+    {
+        return Sale::whereBetween('created_at', [$from, $to])
+            ->with(['customer', 'user', 'items.product'])
+            ->orderBy('created_at')
+            ->get();
     }
 
     private function granularity(Request $request): string

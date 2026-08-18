@@ -17,12 +17,21 @@
     <div class="flex items-center justify-between mb-4">
         <h1 class="text-2xl font-semibold text-brand-dark">Relatórios de Vendas</h1>
 
-        <a
-            href="{{ route('reports.export', ['granularity' => $granularity]) }}"
-            class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
-        >
-            Exportar CSV
-        </a>
+        <div class="flex items-center gap-3">
+            <a
+                href="{{ route('reports.sales.index') }}"
+                class="text-sm text-brand hover:underline cursor-pointer"
+            >
+                Vendas detalhadas (com filtro de datas) &rarr;
+            </a>
+
+            <a
+                href="{{ route('reports.export', ['granularity' => $granularity]) }}"
+                class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
+            >
+                Exportar CSV
+            </a>
+        </div>
     </div>
 
     <div class="flex rounded-md border border-stone-300 overflow-hidden text-sm w-fit mb-4">

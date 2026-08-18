@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/reports/detail', [ReportController::class, 'detail'])->name('reports.detail');
+    Route::get('/reports/sales', [ReportController::class, 'salesIndex'])->name('reports.sales.index');
+    Route::get('/reports/sales/export', [ReportController::class, 'salesExport'])->name('reports.sales.export');
 
     Route::resource('units', UnitController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
