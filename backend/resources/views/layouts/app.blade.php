@@ -11,7 +11,7 @@
     <div class="min-h-screen flex flex-col">
         <header class="bg-brand text-brand-cream shadow">
             <div class="flex items-center justify-between px-6 py-4">
-                <span class="text-lg font-semibold">Stock Manager</span>
+                <span class="text-lg font-semibold">Go &amp; Do Emporium</span>
 
                 @auth
                     <div class="flex items-center gap-4">
