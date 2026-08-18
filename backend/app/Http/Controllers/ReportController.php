@@ -58,6 +58,7 @@ class ReportController extends Controller implements HasMiddleware
 
         return response()->streamDownload(function () use ($rows) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['Período', 'Vendas', 'Total (R$)'], ';');
 
             foreach ($rows as $row) {
@@ -110,6 +111,7 @@ class ReportController extends Controller implements HasMiddleware
 
         return response()->streamDownload(function () use ($sales) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['Data/Hora', 'Produto(s)', 'Forma de pagamento', 'Vendedor', 'Cliente', 'Status', 'Total (R$)'], ';');
 
             foreach ($sales as $sale) {
