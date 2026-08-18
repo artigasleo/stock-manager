@@ -40,6 +40,12 @@ class DashboardController extends Controller implements HasMiddleware
         $stockValue = (clone $activeStocks)->get()
             ->sum(fn (ProductStock $stock) => $stock->quantity * $stock->product->cost_price);
 
+        $paymentMethodBreakdown = (clone $salesMonth)
+            ->selectRaw('payment_method, count(*) as count, sum(total) as total')
+            ->groupBy('payment_method')
+            ->orderByDesc('total')
+            ->get();
+
         return view('dashboard', [
             'salesTodayCount' => $salesToday->count(),
             'salesTodayTotal' => $salesToday->sum('total'),
@@ -47,6 +53,7 @@ class DashboardController extends Controller implements HasMiddleware
             'salesMonthTotal' => $salesMonth->sum('total'),
             'lowStockStocks' => $lowStockStocks,
             'stockValue' => $stockValue,
+            'paymentMethodBreakdown' => $paymentMethodBreakdown,
             'recentMovements' => StockMovement::with('product')->latest()->limit(8)->get(),
         ]);
     }

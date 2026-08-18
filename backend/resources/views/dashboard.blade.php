@@ -3,6 +3,14 @@
 @section('content')
     @php
         $lowStockCount = $lowStockStocks->count();
+
+        $paymentLabels = [
+            'cash' => 'Dinheiro',
+            'pix' => 'PIX',
+            'debit_card' => 'Cartão de Débito',
+            'credit_card' => 'Cartão de Crédito',
+            'other' => 'Outro',
+        ];
     @endphp
 
     <h1 class="text-2xl font-semibold text-brand-dark mb-4">Dashboard</h1>
@@ -64,6 +72,37 @@
                         <tr>
                             <td colspan="3" class="px-4 py-6 text-center text-stone-500">
                                 Nenhum produto com estoque baixo.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200">
+                <h2 class="font-semibold text-brand-dark">Formas de pagamento (mês)</h2>
+            </div>
+
+            <table class="w-full text-sm">
+                <thead class="bg-stone-100 text-left text-stone-600">
+                    <tr>
+                        <th class="px-4 py-2">Forma de pagamento</th>
+                        <th class="px-4 py-2">Vendas</th>
+                        <th class="px-4 py-2">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-200">
+                    @forelse ($paymentMethodBreakdown as $row)
+                        <tr>
+                            <td class="px-4 py-2">{{ $paymentLabels[$row->payment_method] ?? 'Não informado' }}</td>
+                            <td class="px-4 py-2">{{ $row->count }}</td>
+                            <td class="px-4 py-2">R$ {{ number_format($row->total, 2, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-4 py-6 text-center text-stone-500">
+                                Nenhuma venda registrada no mês.
                             </td>
                         </tr>
                     @endforelse
