@@ -33,6 +33,7 @@
                 @php
                     $navItems = [
                         ['label' => 'Dashboard', 'route' => 'dashboard', 'permission' => 'dashboard.view'],
+                        ['label' => 'Relatórios', 'route' => 'reports.index', 'permission' => 'reports.view'],
                         ['label' => 'Categorias', 'route' => 'categories.index', 'permission' => 'categories.view'],
                         ['label' => 'Estoque', 'route' => 'products.index', 'permission' => 'products.view'],
                         ['label' => 'Fornecedores', 'route' => 'suppliers.index', 'permission' => 'suppliers.view'],

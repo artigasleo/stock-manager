@@ -6,6 +6,7 @@
 // `actions` é ['view'] pra módulos sem nada pra editar (ex.: Dashboard).
 return [
     'dashboard' => ['label' => 'Dashboard', 'actions' => ['view']],
+    'reports' => ['label' => 'Relatórios', 'actions' => ['view']],
     'categories' => ['label' => 'Categorias', 'actions' => ['view', 'edit']],
     'products' => ['label' => 'Estoque', 'actions' => ['view', 'edit']],
     'suppliers' => ['label' => 'Fornecedores', 'actions' => ['view', 'edit']],
