@@ -10,10 +10,20 @@ use App\Http\Requests\Category\StoreCategoryRequest;
 use App\Http\Requests\Category\UpdateCategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class CategoryController extends Controller
+class CategoryController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:categories.view', only: ['index']),
+            new Middleware('permission:categories.edit', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(ListCategory $action): View
     {
         return view('categories.index', [

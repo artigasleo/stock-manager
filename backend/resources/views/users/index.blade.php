@@ -1,8 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    @php $activeDefault = $errors->any() ? (bool) old('active') : true; @endphp
-
     <div
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
@@ -10,15 +8,15 @@
         }"
     >
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-semibold text-brand-dark">Clientes</h1>
+            <h1 class="text-2xl font-semibold text-brand-dark">Usuários</h1>
 
-            @can('customers.edit')
+            @can('users.edit')
                 <button
                     type="button"
                     @click="editing = null; modalOpen = true"
                     class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
                 >
-                    Novo cliente
+                    Novo usuário
                 </button>
             @endcan
         </div>
@@ -28,54 +26,56 @@
                 <thead class="bg-stone-100 text-left text-stone-600">
                     <tr>
                         <th class="px-4 py-3">Nome</th>
-                        <th class="px-4 py-3">CPF</th>
-                        <th class="px-4 py-3">Telefone</th>
                         <th class="px-4 py-3">E-mail</th>
-                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Papéis</th>
                         <th class="px-4 py-3 w-32">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
-                    @forelse ($customers as $customer)
+                    @forelse ($users as $user)
                         <tr>
-                            <td class="px-4 py-3">{{ $customer->name }}</td>
-                            <td class="px-4 py-3">{{ $customer->document ?? '—' }}</td>
-                            <td class="px-4 py-3">{{ $customer->phone ?? '—' }}</td>
-                            <td class="px-4 py-3">{{ $customer->email ?? '—' }}</td>
+                            <td class="px-4 py-3">{{ $user->name }}</td>
+                            <td class="px-4 py-3">{{ $user->email }}</td>
                             <td class="px-4 py-3">
-                                <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $customer->active ? 'bg-green-100 text-green-800' : 'bg-stone-200 text-stone-600' }}">
-                                    {{ $customer->active ? 'Ativo' : 'Inativo' }}
-                                </span>
+                                @forelse ($user->roles as $role)
+                                    <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 mr-1">
+                                        {{ $role->name }}
+                                    </span>
+                                @empty
+                                    <span class="text-stone-400">—</span>
+                                @endforelse
                             </td>
                             <td class="px-4 py-3">
-                                @can('customers.edit')
+                                @can('users.edit')
                                     <button
                                         type="button"
-                                        @click="editing = @js($customer); modalOpen = true"
+                                        @click="editing = @js($user); modalOpen = true"
                                         class="text-brand hover:underline cursor-pointer mr-3"
                                     >
                                         Editar
                                     </button>
 
-                                    <form
-                                        method="POST"
-                                        action="{{ route('customers.destroy', $customer) }}"
-                                        class="inline"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este cliente?')"
-                                    >
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:underline cursor-pointer">
-                                            Excluir
-                                        </button>
-                                    </form>
+                                    @if ($user->id !== auth()->id())
+                                        <form
+                                            method="POST"
+                                            action="{{ route('users.destroy', $user) }}"
+                                            class="inline"
+                                            onsubmit="return confirm('Tem certeza que deseja excluir este usuário?')"
+                                        >
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline cursor-pointer">
+                                                Excluir
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endcan
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-stone-500">
-                                Nenhum cliente cadastrado.
+                            <td colspan="4" class="px-4 py-6 text-center text-stone-500">
+                                Nenhum usuário cadastrado.
                             </td>
                         </tr>
                     @endforelse
@@ -90,11 +90,11 @@
             style="display: none;"
         >
             <div class="w-full max-w-md bg-brand-paper rounded-lg shadow p-6" @click.outside="modalOpen = false">
-                <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar cliente' : 'Novo cliente'"></h2>
+                <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar usuário' : 'Novo usuário'"></h2>
 
                 <form
                     method="POST"
-                    :action="editing ? `/customers/${editing.id}` : '{{ route('customers.store') }}'"
+                    :action="editing ? `/users/${editing.id}` : '{{ route('users.store') }}'"
                     class="space-y-4"
                 >
                     @csrf
@@ -115,32 +115,6 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">CPF</label>
-                        <input
-                            type="text"
-                            name="document"
-                            :value="editing && editing.document !== undefined ? editing.document : '{{ old('document') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('document')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Telefone</label>
-                        <input
-                            type="text"
-                            name="phone"
-                            :value="editing && editing.phone !== undefined ? editing.phone : '{{ old('phone') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('phone')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium mb-1">E-mail</label>
                         <input
                             type="email"
@@ -154,29 +128,37 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Endereço</label>
+                        <label class="block text-sm font-medium mb-1">Senha</label>
                         <input
-                            type="text"
-                            name="address"
-                            :value="editing && editing.address !== undefined ? editing.address : '{{ old('address') }}'"
+                            type="password"
+                            name="password"
                             class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                         >
-                        @error('address')
+                        <p class="mt-1 text-xs text-stone-500" x-show="editing">Deixe em branco para manter a senha atual.</p>
+                        @error('password')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <input type="hidden" name="active" value="0">
-                        <input
-                            id="customer-active"
-                            type="checkbox"
-                            name="active"
-                            value="1"
-                            :checked="editing && editing.active !== undefined ? editing.active : {{ $activeDefault ? 'true' : 'false' }}"
-                            class="rounded border-stone-300"
-                        >
-                        <label for="customer-active" class="text-sm">Ativo</label>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Papéis</label>
+                        <div class="space-y-1">
+                            @foreach ($roles as $role)
+                                <label class="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="roles[]"
+                                        value="{{ $role->name }}"
+                                        :checked="editing && editing.roles !== undefined ? editing.roles.some((r) => r.name === '{{ $role->name }}') : {{ collect(old('roles', []))->contains($role->name) ? 'true' : 'false' }}"
+                                        class="rounded border-stone-300"
+                                    >
+                                    <span class="text-sm">{{ $role->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        @error('roles')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="flex justify-end gap-2 pt-2">

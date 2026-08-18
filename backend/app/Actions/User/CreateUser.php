@@ -15,9 +15,7 @@ class CreateUser
             'password' => $request->validated('password'),
         ]);
 
-        if ($role = $request->validated('role')) {
-            $user->assignRole($role);
-        }
+        $user->syncRoles($request->validated('roles') ?? []);
 
         return $user;
     }

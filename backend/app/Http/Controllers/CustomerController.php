@@ -10,10 +10,20 @@ use App\Http\Requests\Customer\StoreCustomerRequest;
 use App\Http\Requests\Customer\UpdateCustomerRequest;
 use App\Models\Customer;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class CustomerController extends Controller
+class CustomerController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:customers.view', only: ['index']),
+            new Middleware('permission:customers.edit', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(ListCustomer $action): View
     {
         return view('customers.index', [

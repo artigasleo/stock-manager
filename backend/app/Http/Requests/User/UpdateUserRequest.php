@@ -36,8 +36,12 @@ class UpdateUserRequest extends FormRequest
                 'min:8',
             ],
 
-            'role' => [
+            'roles' => [
                 'sometimes',
+                'array',
+            ],
+
+            'roles.*' => [
                 'string',
                 'exists:roles,name',
             ],
@@ -52,7 +56,7 @@ class UpdateUserRequest extends FormRequest
             'email.email' => 'Informe um e-mail válido.',
             'email.unique' => 'Já existe um usuário com esse e-mail.',
             'password.min' => 'A senha deve possuir no mínimo 8 caracteres.',
-            'role.exists' => 'A role informada não existe.',
+            'roles.*.exists' => 'Um dos papéis informados não existe.',
         ];
     }
 }

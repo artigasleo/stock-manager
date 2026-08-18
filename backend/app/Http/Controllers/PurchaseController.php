@@ -11,11 +11,21 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 use InvalidArgumentException;
 
-class PurchaseController extends Controller
+class PurchaseController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:purchases.view', only: ['index']),
+            new Middleware('permission:purchases.edit', only: ['store', 'import']),
+        ];
+    }
+
     public function index(ListPurchase $action): View
     {
         return view('purchases.index', [

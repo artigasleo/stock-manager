@@ -13,10 +13,20 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:products.view', only: ['index']),
+            new Middleware('permission:products.edit', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(ListProduct $action): View
     {
         return view('estoque.index', [

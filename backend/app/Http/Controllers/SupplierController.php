@@ -10,10 +10,20 @@ use App\Http\Requests\Supplier\StoreSupplierRequest;
 use App\Http\Requests\Supplier\UpdateSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class SupplierController extends Controller
+class SupplierController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:suppliers.view', only: ['index']),
+            new Middleware('permission:suppliers.edit', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(ListSupplier $action): View
     {
         return view('suppliers.index', [

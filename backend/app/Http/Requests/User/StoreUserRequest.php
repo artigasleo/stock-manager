@@ -33,8 +33,12 @@ class StoreUserRequest extends FormRequest
                 'min:8',
             ],
 
-            'role' => [
+            'roles' => [
                 'sometimes',
+                'array',
+            ],
+
+            'roles.*' => [
                 'string',
                 'exists:roles,name',
             ],
@@ -50,7 +54,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'Já existe um usuário com esse e-mail.',
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve possuir no mínimo 8 caracteres.',
-            'role.exists' => 'A role informada não existe.',
+            'roles.*.exists' => 'Um dos papéis informados não existe.',
         ];
     }
 }

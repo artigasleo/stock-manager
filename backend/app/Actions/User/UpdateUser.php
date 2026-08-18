@@ -20,9 +20,7 @@ class UpdateUser
 
         $user->save();
 
-        if ($role = $request->validated('role')) {
-            $user->syncRoles([$role]);
-        }
+        $user->syncRoles($request->validated('roles') ?? []);
 
         return $user;
     }

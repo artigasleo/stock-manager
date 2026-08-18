@@ -9,10 +9,20 @@ use App\Models\Product;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class StockMovementController extends Controller
+class StockMovementController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:stock.view', only: ['index']),
+            new Middleware('permission:stock.edit', only: ['store']),
+        ];
+    }
+
     public function index(Request $request, ListStockMovement $action): View
     {
         return view('movimentacoes.index', [

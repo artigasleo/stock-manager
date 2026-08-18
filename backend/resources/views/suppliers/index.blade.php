@@ -12,13 +12,15 @@
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-semibold text-brand-dark">Fornecedores</h1>
 
-            <button
-                type="button"
-                @click="editing = null; modalOpen = true"
-                class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
-            >
-                Novo fornecedor
-            </button>
+            @can('suppliers.edit')
+                <button
+                    type="button"
+                    @click="editing = null; modalOpen = true"
+                    class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
+                >
+                    Novo fornecedor
+                </button>
+            @endcan
         </div>
 
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
@@ -46,26 +48,28 @@
                                 </span>
                             </td>
                             <td class="px-4 py-3">
-                                <button
-                                    type="button"
-                                    @click="editing = @js($supplier); modalOpen = true"
-                                    class="text-brand hover:underline cursor-pointer mr-3"
-                                >
-                                    Editar
-                                </button>
-
-                                <form
-                                    method="POST"
-                                    action="{{ route('suppliers.destroy', $supplier) }}"
-                                    class="inline"
-                                    onsubmit="return confirm('Tem certeza que deseja excluir este fornecedor?')"
-                                >
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline cursor-pointer">
-                                        Excluir
+                                @can('suppliers.edit')
+                                    <button
+                                        type="button"
+                                        @click="editing = @js($supplier); modalOpen = true"
+                                        class="text-brand hover:underline cursor-pointer mr-3"
+                                    >
+                                        Editar
                                     </button>
-                                </form>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ route('suppliers.destroy', $supplier) }}"
+                                        class="inline"
+                                        onsubmit="return confirm('Tem certeza que deseja excluir este fornecedor?')"
+                                    >
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:underline cursor-pointer">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

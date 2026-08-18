@@ -26,13 +26,15 @@
         <div class="flex items-center justify-between mb-4">
             <h1 class="text-2xl font-semibold text-brand-dark">Movimentações</h1>
 
-            <button
-                type="button"
-                @click="modalOpen = true"
-                class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
-            >
-                Nova movimentação
-            </button>
+            @can('stock.edit')
+                <button
+                    type="button"
+                    @click="modalOpen = true"
+                    class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
+                >
+                    Nova movimentação
+                </button>
+            @endcan
         </div>
 
         <form method="GET" action="{{ route('stock.index') }}" class="mb-4">

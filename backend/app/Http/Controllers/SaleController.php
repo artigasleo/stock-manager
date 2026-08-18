@@ -12,10 +12,20 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class SaleController extends Controller
+class SaleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:sales.view', only: ['index']),
+            new Middleware('permission:sales.edit', only: ['store', 'updateStatus']),
+        ];
+    }
+
     public function index(ListSale $action): View
     {
         return view('sales.index', [

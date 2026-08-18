@@ -10,10 +10,20 @@ use App\Http\Requests\Unit\StoreUnitRequest;
 use App\Http\Requests\Unit\UpdateUnitRequest;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class UnitController extends Controller
+class UnitController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:units.view', only: ['index']),
+            new Middleware('permission:units.edit', only: ['store', 'update', 'destroy']),
+        ];
+    }
+
     public function index(ListUnit $action): View
     {
         return view('units.index', [
