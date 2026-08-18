@@ -1,16 +1,18 @@
 <?php
 
-// Catálogo único dos módulos do sistema: slug => label em PT-BR.
-// Usado pra semear as permissions (`{slug}.view` / `{slug}.edit`), montar a
-// matriz de permissões na tela de Papéis, e decidir o que aparece na Sidebar.
+// Catálogo único dos módulos do sistema: slug => ['label' => ..., 'actions' => [...]].
+// Usado pra semear as permissions (`{slug}.{action}`), montar a matriz de
+// permissões na tela de Papéis, e decidir o que aparece na Sidebar.
+// `actions` é ['view'] pra módulos sem nada pra editar (ex.: Dashboard).
 return [
-    'categories' => 'Categorias',
-    'products' => 'Estoque',
-    'suppliers' => 'Fornecedores',
-    'customers' => 'Clientes',
-    'stock' => 'Movimentações',
-    'purchases' => 'Compras',
-    'sales' => 'Vendas',
-    'units' => 'Unidades',
-    'users' => 'Usuários',
+    'dashboard' => ['label' => 'Dashboard', 'actions' => ['view']],
+    'categories' => ['label' => 'Categorias', 'actions' => ['view', 'edit']],
+    'products' => ['label' => 'Estoque', 'actions' => ['view', 'edit']],
+    'suppliers' => ['label' => 'Fornecedores', 'actions' => ['view', 'edit']],
+    'customers' => ['label' => 'Clientes', 'actions' => ['view', 'edit']],
+    'stock' => ['label' => 'Movimentações', 'actions' => ['view', 'edit']],
+    'purchases' => ['label' => 'Compras', 'actions' => ['view', 'edit']],
+    'sales' => ['label' => 'Vendas', 'actions' => ['view', 'edit']],
+    'units' => ['label' => 'Unidades', 'actions' => ['view', 'edit']],
+    'users' => ['label' => 'Usuários', 'actions' => ['view', 'edit']],
 ];

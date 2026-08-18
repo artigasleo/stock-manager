@@ -12,8 +12,8 @@ class PermissionSeeder extends Seeder
     {
         $permissionNames = [];
 
-        foreach (array_keys(config('modules')) as $module) {
-            foreach (['view', 'edit'] as $action) {
+        foreach (config('modules') as $module => $config) {
+            foreach ($config['actions'] as $action) {
                 $permissionNames[] = "{$module}.{$action}";
             }
         }

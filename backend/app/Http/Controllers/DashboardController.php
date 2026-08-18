@@ -6,10 +6,19 @@ use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use App\Models\Unit;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
 
-class DashboardController extends Controller
+class DashboardController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:dashboard.view'),
+        ];
+    }
+
     public function __invoke(): View
     {
         $unit = Unit::default();

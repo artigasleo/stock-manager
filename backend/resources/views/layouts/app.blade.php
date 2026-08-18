@@ -32,7 +32,7 @@
             <nav class="w-60 bg-brand-paper border-r border-stone-200 p-4">
                 @php
                     $navItems = [
-                        ['label' => 'Dashboard', 'route' => 'dashboard', 'permission' => null],
+                        ['label' => 'Dashboard', 'route' => 'dashboard', 'permission' => 'dashboard.view'],
                         ['label' => 'Categorias', 'route' => 'categories.index', 'permission' => 'categories.view'],
                         ['label' => 'Estoque', 'route' => 'products.index', 'permission' => 'products.view'],
                         ['label' => 'Fornecedores', 'route' => 'suppliers.index', 'permission' => 'suppliers.view'],

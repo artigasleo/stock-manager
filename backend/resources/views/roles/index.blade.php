@@ -36,7 +36,7 @@
                         <tr>
                             <td class="px-4 py-3">{{ $role->name }}</td>
                             <td class="px-4 py-3">{{ $role->users_count }}</td>
-                            <td class="px-4 py-3">{{ $role->permissions->count() }} de {{ count($modules) * 2 }}</td>
+                            <td class="px-4 py-3">{{ $role->permissions->count() }} de {{ $permissions->count() }}</td>
                             <td class="px-4 py-3">
                                 @can('users.edit')
                                     <button
@@ -122,26 +122,30 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-stone-200">
-                                @foreach ($modules as $slug => $label)
+                                @foreach ($modules as $slug => $module)
                                     <tr>
-                                        <td class="px-3 py-2">{{ $label }}</td>
+                                        <td class="px-3 py-2">{{ $module['label'] }}</td>
                                         <td class="px-3 py-2 text-center">
-                                            <input
-                                                type="checkbox"
-                                                name="permissions[]"
-                                                value="{{ $slug }}.view"
-                                                :checked="editing && editing.permissions !== undefined ? editing.permissions.some((p) => p.name === '{{ $slug }}.view') : {{ collect(old('permissions', []))->contains($slug.'.view') ? 'true' : 'false' }}"
-                                                class="rounded border-stone-300"
-                                            >
+                                            @if (in_array('view', $module['actions']))
+                                                <input
+                                                    type="checkbox"
+                                                    name="permissions[]"
+                                                    value="{{ $slug }}.view"
+                                                    :checked="editing && editing.permissions !== undefined ? editing.permissions.some((p) => p.name === '{{ $slug }}.view') : {{ collect(old('permissions', []))->contains($slug.'.view') ? 'true' : 'false' }}"
+                                                    class="rounded border-stone-300"
+                                                >
+                                            @endif
                                         </td>
                                         <td class="px-3 py-2 text-center">
-                                            <input
-                                                type="checkbox"
-                                                name="permissions[]"
-                                                value="{{ $slug }}.edit"
-                                                :checked="editing && editing.permissions !== undefined ? editing.permissions.some((p) => p.name === '{{ $slug }}.edit') : {{ collect(old('permissions', []))->contains($slug.'.edit') ? 'true' : 'false' }}"
-                                                class="rounded border-stone-300"
-                                            >
+                                            @if (in_array('edit', $module['actions']))
+                                                <input
+                                                    type="checkbox"
+                                                    name="permissions[]"
+                                                    value="{{ $slug }}.edit"
+                                                    :checked="editing && editing.permissions !== undefined ? editing.permissions.some((p) => p.name === '{{ $slug }}.edit') : {{ collect(old('permissions', []))->contains($slug.'.edit') ? 'true' : 'false' }}"
+                                                    class="rounded border-stone-300"
+                                                >
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
