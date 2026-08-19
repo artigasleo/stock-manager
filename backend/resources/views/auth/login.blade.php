@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Entrar - Stock Manager</title>
+    <title>Entrar - Go & Do Emporium</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-brand-cream text-stone-800 antialiased">
     <div class="min-h-screen flex items-center justify-center">
         <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-8">
-            <h1 class="text-xl font-semibold text-brand-dark mb-6">Stock Manager</h1>
+            <h1 class="text-xl font-semibold text-brand-dark mb-6">Go & Do Emporium</h1>
 
             <form method="POST" action="{{ route('login.store') }}" class="space-y-4">
                 @csrf
