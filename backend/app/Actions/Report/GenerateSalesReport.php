@@ -24,46 +24,72 @@ class GenerateSalesReport
         }
 
         return match ($granularity) {
-            'day' => $this->truncated('day', 30, fn (Carbon $date) => $date->format('d/m/Y')),
-            'month' => $this->truncated('month', 12, fn (Carbon $date) => self::MONTH_NAMES[$date->month].'/'.$date->format('Y')),
-            'quarter' => $this->truncated('quarter', 8, fn (Carbon $date) => ceil($date->month / 3).'º Trimestre/'.$date->format('Y')),
-            'year' => $this->truncated('year', 5, fn (Carbon $date) => $date->format('Y')),
-            'semester' => $this->semesters(6),
+            'day' => $this->byDay(30),
+            'month' => $this->byMonth(12),
+            'quarter' => $this->byQuarter(8),
+            'semester' => $this->bySemester(6),
+            'year' => $this->byYear(5),
         };
     }
 
-    private function truncated(string $unit, int $limit, callable $label): Collection
+    // DATE()/EXTRACT() são padrão ANSI SQL e funcionam igual em Postgres e MySQL —
+    // evita depender de date_trunc(), que só existe no Postgres, já que a produção
+    // roda em MySQL (hospedagem compartilhada) enquanto o dev local usa Postgres.
+    private function byDay(int $limit): Collection
     {
         return Sale::where('status', '!=', 'cancelled')
-            ->selectRaw("date_trunc('{$unit}', created_at) as period, count(*) as count, sum(total) as total")
-            ->groupBy('period')
-            ->orderByDesc('period')
+            ->selectRaw('DATE(created_at) as day, count(*) as count, sum(total) as total')
+            ->groupBy('day')
+            ->orderByDesc('day')
             ->limit($limit)
             ->get()
-            ->map(function ($row) use ($unit, $label) {
-                $start = Carbon::parse($row->period);
+            ->map(function ($row) {
+                $start = Carbon::parse($row->day)->startOfDay();
 
-                $end = match ($unit) {
-                    'day' => $start->copy()->endOfDay(),
-                    'month' => $start->copy()->endOfMonth(),
-                    'quarter' => $start->copy()->endOfQuarter(),
-                    'year' => $start->copy()->endOfYear(),
-                };
-
-                return (object) [
-                    'label' => $label($start),
-                    'count' => (int) $row->count,
-                    'total' => (float) $row->total,
-                    'start' => $start,
-                    'end' => $end,
-                ];
+                return $this->row($row, $start->format('d/m/Y'), $start, $start->copy()->endOfDay());
             });
     }
 
-    private function semesters(int $limit): Collection
+    private function byMonth(int $limit): Collection
     {
         return Sale::where('status', '!=', 'cancelled')
-            ->selectRaw('extract(year from created_at) as year, ceil(extract(month from created_at) / 6.0) as semester, count(*) as count, sum(total) as total')
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as year, EXTRACT(MONTH FROM created_at) as month, count(*) as count, sum(total) as total')
+            ->groupBy('year', 'month')
+            ->orderByDesc('year')
+            ->orderByDesc('month')
+            ->limit($limit)
+            ->get()
+            ->map(function ($row) {
+                $year = (int) $row->year;
+                $month = (int) $row->month;
+                $start = Carbon::create($year, $month, 1)->startOfDay();
+
+                return $this->row($row, self::MONTH_NAMES[$month].'/'.$year, $start, $start->copy()->endOfMonth());
+            });
+    }
+
+    private function byQuarter(int $limit): Collection
+    {
+        return Sale::where('status', '!=', 'cancelled')
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as year, EXTRACT(QUARTER FROM created_at) as quarter, count(*) as count, sum(total) as total')
+            ->groupBy('year', 'quarter')
+            ->orderByDesc('year')
+            ->orderByDesc('quarter')
+            ->limit($limit)
+            ->get()
+            ->map(function ($row) {
+                $year = (int) $row->year;
+                $quarter = (int) $row->quarter;
+                $start = Carbon::create($year, ($quarter - 1) * 3 + 1, 1)->startOfDay();
+
+                return $this->row($row, "{$quarter}º Trimestre/{$year}", $start, $start->copy()->endOfQuarter());
+            });
+    }
+
+    private function bySemester(int $limit): Collection
+    {
+        return Sale::where('status', '!=', 'cancelled')
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as year, CEIL(EXTRACT(MONTH FROM created_at) / 6.0) as semester, count(*) as count, sum(total) as total')
             ->groupBy('year', 'semester')
             ->orderByDesc('year')
             ->orderByDesc('semester')
@@ -74,13 +100,34 @@ class GenerateSalesReport
                 $semester = (int) $row->semester;
                 $start = Carbon::create($year, $semester === 1 ? 1 : 7, 1)->startOfDay();
 
-                return (object) [
-                    'label' => $semester.'º Semestre/'.$year,
-                    'count' => (int) $row->count,
-                    'total' => (float) $row->total,
-                    'start' => $start,
-                    'end' => $start->copy()->addMonths(6)->subSecond(),
-                ];
+                return $this->row($row, "{$semester}º Semestre/{$year}", $start, $start->copy()->addMonths(6)->subSecond());
             });
+    }
+
+    private function byYear(int $limit): Collection
+    {
+        return Sale::where('status', '!=', 'cancelled')
+            ->selectRaw('EXTRACT(YEAR FROM created_at) as year, count(*) as count, sum(total) as total')
+            ->groupBy('year')
+            ->orderByDesc('year')
+            ->limit($limit)
+            ->get()
+            ->map(function ($row) {
+                $year = (int) $row->year;
+                $start = Carbon::create($year, 1, 1)->startOfDay();
+
+                return $this->row($row, (string) $year, $start, $start->copy()->endOfYear());
+            });
+    }
+
+    private function row(object $row, string $label, Carbon $start, Carbon $end): object
+    {
+        return (object) [
+            'label' => $label,
+            'count' => (int) $row->count,
+            'total' => (float) $row->total,
+            'start' => $start,
+            'end' => $end,
+        ];
     }
 }
