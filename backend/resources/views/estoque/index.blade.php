@@ -13,13 +13,36 @@
             <h1 class="text-2xl font-semibold text-brand-dark">Estoque</h1>
 
             @can('products.edit')
-                <button
-                    type="button"
-                    @click="editing = null; modalOpen = true"
-                    class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
-                >
-                    Novo produto
-                </button>
+                <div class="flex items-center gap-3">
+                    <a
+                        href="{{ route('products.import.template') }}"
+                        class="text-sm text-brand hover:underline cursor-pointer"
+                    >
+                        Baixar modelo
+                    </a>
+
+                    <form method="POST" action="{{ route('products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
+                        @csrf
+                        <input
+                            type="file"
+                            name="xlsx_file"
+                            accept=".xlsx,.xls"
+                            required
+                            class="text-sm rounded-md border border-stone-300 px-2 py-1.5 bg-white"
+                        >
+                        <button type="submit" class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer">
+                            Importar XLSX
+                        </button>
+                    </form>
+
+                    <button
+                        type="button"
+                        @click="editing = null; modalOpen = true"
+                        class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
+                    >
+                        Novo produto
+                    </button>
+                </div>
             @endcan
         </div>
 

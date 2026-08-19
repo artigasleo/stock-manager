@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
         ->names('products')
         ->parameters(['estoque' => 'product'])
         ->only(['index', 'store', 'update', 'destroy']);
+    Route::post('/estoque/import', [ProductController::class, 'import'])->name('products.import');
+    Route::get('/estoque/import/template', [ProductController::class, 'template'])->name('products.import.template');
 
     Route::resource('movimentacoes', StockMovementController::class)
         ->names('stock')
