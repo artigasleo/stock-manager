@@ -43,7 +43,7 @@
                         <td class="px-4 py-3">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                         <td class="px-4 py-3">{{ $sale->customer?->name ?? 'Não identificado' }}</td>
                         <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? 'Não informado' }}</td>
-                        <td class="px-4 py-3">{{ $sale->user->name }}</td>
+                        <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                         <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
                     </tr>
                 @empty

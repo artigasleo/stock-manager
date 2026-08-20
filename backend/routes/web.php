@@ -9,6 +9,7 @@ use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SellerController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
@@ -34,6 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('customers', CustomerController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::resource('sellers', SellerController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('estoque', ProductController::class)
         ->names('products')
         ->parameters(['estoque' => 'product'])

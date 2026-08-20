@@ -81,7 +81,7 @@ class ReportController extends Controller implements HasMiddleware
         return view('reports.detail', [
             'sales' => Sale::where('status', '!=', 'cancelled')
                 ->whereBetween('created_at', [$from, $to])
-                ->with(['customer', 'user'])
+                ->with(['customer', 'seller', 'user'])
                 ->orderBy('created_at')
                 ->get(),
             'label' => $request->string('label')->value(),
@@ -119,7 +119,7 @@ class ReportController extends Controller implements HasMiddleware
                     $sale->created_at->format('d/m/Y H:i'),
                     $sale->items->map(fn ($item) => $item->product->name.' (x'.$item->quantity.')')->implode(', '),
                     self::PAYMENT_LABELS[$sale->payment_method] ?? 'Não informado',
-                    $sale->user->name,
+                    $sale->seller?->name ?? '—',
                     $sale->customer?->name ?? 'Não identificado',
                     self::STATUS_LABELS[$sale->status] ?? $sale->status,
                     number_format($sale->total, 2, ',', '.'),
@@ -145,7 +145,7 @@ class ReportController extends Controller implements HasMiddleware
     private function salesBetween(Carbon $from, Carbon $to): Collection
     {
         return Sale::whereBetween('created_at', [$from, $to])
-            ->with(['customer', 'user', 'items.product'])
+            ->with(['customer', 'seller', 'user', 'items.product'])
             ->orderBy('created_at')
             ->get();
     }

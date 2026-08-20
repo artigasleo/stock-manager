@@ -26,6 +26,12 @@ class StoreSaleRequest extends FormRequest
                 'exists:customers,id',
             ],
 
+            'seller_id' => [
+                'required',
+                'integer',
+                'exists:sellers,id',
+            ],
+
             'payment_method' => [
                 'nullable',
                 'string',
@@ -65,6 +71,8 @@ class StoreSaleRequest extends FormRequest
             'unit_id.required' => 'A unidade é obrigatória.',
             'unit_id.exists' => 'A unidade informada não existe.',
             'customer_id.exists' => 'O cliente informado não existe.',
+            'seller_id.required' => 'O vendedor é obrigatório.',
+            'seller_id.exists' => 'O vendedor informado não existe.',
             'payment_method.in' => 'Forma de pagamento inválida.',
             'items.required' => 'Adicione ao menos um item.',
             'items.min' => 'Adicione ao menos um item.',

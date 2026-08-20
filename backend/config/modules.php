@@ -11,6 +11,7 @@ return [
     'products' => ['label' => 'Estoque', 'actions' => ['view', 'edit']],
     'suppliers' => ['label' => 'Fornecedores', 'actions' => ['view', 'edit']],
     'customers' => ['label' => 'Clientes', 'actions' => ['view', 'edit']],
+    'sellers' => ['label' => 'Vendedores', 'actions' => ['view', 'edit']],
     'stock' => ['label' => 'Movimentações', 'actions' => ['view', 'edit']],
     'purchases' => ['label' => 'Compras', 'actions' => ['view', 'edit']],
     'sales' => ['label' => 'Vendas', 'actions' => ['view', 'edit']],

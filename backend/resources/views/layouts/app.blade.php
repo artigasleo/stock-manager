@@ -38,6 +38,7 @@
                         ['label' => 'Estoque', 'route' => 'products.index', 'permission' => 'products.view'],
                         ['label' => 'Fornecedores', 'route' => 'suppliers.index', 'permission' => 'suppliers.view'],
                         ['label' => 'Clientes', 'route' => 'customers.index', 'permission' => 'customers.view'],
+                        ['label' => 'Vendedores', 'route' => 'sellers.index', 'permission' => 'sellers.view'],
                         ['label' => 'Movimentações', 'route' => 'stock.index', 'permission' => 'stock.view'],
                         ['label' => 'Compras', 'route' => 'purchases.index', 'permission' => 'purchases.view'],
                         ['label' => 'Vendas', 'route' => 'sales.index', 'permission' => 'sales.view'],

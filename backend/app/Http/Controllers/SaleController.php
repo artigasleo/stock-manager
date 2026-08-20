@@ -10,6 +10,7 @@ use App\Http\Requests\Sale\UpdateSaleStatusRequest;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\Seller;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -31,6 +32,7 @@ class SaleController extends Controller implements HasMiddleware
         return view('sales.index', [
             'sales' => $action->execute(),
             'customers' => Customer::orderBy('name')->get(),
+            'sellers' => Seller::where('active', true)->orderBy('name')->get(),
             'products' => Product::with('stocks')->orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
             'defaultUnit' => Unit::default(),

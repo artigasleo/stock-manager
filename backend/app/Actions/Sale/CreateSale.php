@@ -28,6 +28,7 @@ class CreateSale
             $sale = Sale::create([
                 'unit_id' => $unit->id,
                 'customer_id' => $request->validated('customer_id'),
+                'seller_id' => $request->validated('seller_id'),
                 'user_id' => $user->id,
                 'status' => 'awaiting_payment',
                 'payment_method' => $request->validated('payment_method'),

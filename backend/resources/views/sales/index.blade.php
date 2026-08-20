@@ -145,7 +145,7 @@
                             <td class="px-4 py-3">{{ $sale->items->pluck('product.name')->join(', ') }}</td>
                             <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? '—' }}</td>
                             <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
-                            <td class="px-4 py-3">{{ $sale->user->name }}</td>
+                            <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                             <td class="px-4 py-3">
                                 @if ($sale->status === 'cancelled' || ! auth()->user()->can('sales.edit'))
                                     <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $statusColors[$sale->status] }}">
@@ -199,7 +199,7 @@
                 <form method="POST" action="{{ route('sales.store') }}" class="space-y-4">
                     @csrf
 
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-4 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Unidade</label>
                             <select
@@ -228,6 +228,24 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Vendedor</label>
+                            <select
+                                name="seller_id"
+                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                                <option value="" disabled @selected(!old('seller_id'))>Selecione...</option>
+                                @foreach ($sellers as $seller)
+                                    <option value="{{ $seller->id }}" @selected(old('seller_id') == $seller->id)>
+                                        {{ $seller->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('seller_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>

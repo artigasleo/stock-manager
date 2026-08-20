@@ -70,7 +70,7 @@
                             {{ $sale->items->map(fn ($item) => $item->product->name.' (x'.$item->quantity.')')->implode(', ') }}
                         </td>
                         <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? 'Não informado' }}</td>
-                        <td class="px-4 py-3">{{ $sale->user->name }}</td>
+                        <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $sale->customer?->name ?? 'Não identificado' }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$sale->status] ?? $sale->status }}</td>
                         <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
