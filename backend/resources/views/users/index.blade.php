@@ -55,7 +55,7 @@
                                         Editar
                                     </button>
 
-                                    @if ($user->id !== auth()->id())
+                                    @if ($user->id !== auth()->id() && ! $user->is_master)
                                         <form
                                             method="POST"
                                             action="{{ route('users.destroy', $user) }}"

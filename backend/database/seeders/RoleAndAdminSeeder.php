@@ -23,5 +23,10 @@ class RoleAndAdminSeeder extends Seeder
         if (! $admin->hasRole($adminRole)) {
             $admin->assignRole($adminRole);
         }
+
+        if (! $admin->is_master) {
+            $admin->is_master = true;
+            $admin->save();
+        }
     }
 }
