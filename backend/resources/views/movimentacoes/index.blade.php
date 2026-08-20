@@ -68,7 +68,7 @@
                     @forelse ($movements as $movement)
                         <tr>
                             <td class="px-4 py-3">{{ $movement->created_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-4 py-3">{{ $movement->product->name }}</td>
+                            <td class="px-4 py-3">{{ $movement->product?->name ?? 'Produto removido' }}</td>
                             <td class="px-4 py-3">
                                 <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $movement->type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $movement->type === 'in' ? 'Entrada' : 'Saída' }}

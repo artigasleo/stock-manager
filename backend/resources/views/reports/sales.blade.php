@@ -67,7 +67,7 @@
                     <tr>
                         <td class="px-4 py-3">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                         <td class="px-4 py-3">
-                            {{ $sale->items->map(fn ($item) => $item->product->name.' (x'.$item->quantity.')')->implode(', ') }}
+                            {{ $sale->items->map(fn ($item) => ($item->product?->name ?? 'Produto removido').' (x'.$item->quantity.')')->implode(', ') }}
                         </td>
                         <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? 'Não informado' }}</td>
                         <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>

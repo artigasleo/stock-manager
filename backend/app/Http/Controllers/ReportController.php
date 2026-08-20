@@ -117,7 +117,7 @@ class ReportController extends Controller implements HasMiddleware
             foreach ($sales as $sale) {
                 fputcsv($handle, [
                     $sale->created_at->format('d/m/Y H:i'),
-                    $sale->items->map(fn ($item) => $item->product->name.' (x'.$item->quantity.')')->implode(', '),
+                    $sale->items->map(fn ($item) => ($item->product?->name ?? 'Produto removido').' (x'.$item->quantity.')')->implode(', '),
                     self::PAYMENT_LABELS[$sale->payment_method] ?? 'Não informado',
                     $sale->seller?->name ?? '—',
                     $sale->customer?->name ?? 'Não identificado',

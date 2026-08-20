@@ -64,7 +64,7 @@
                 <tbody class="divide-y divide-stone-200">
                     @forelse ($lowStockStocks as $stock)
                         <tr>
-                            <td class="px-4 py-2">{{ $stock->product->name }}</td>
+                            <td class="px-4 py-2">{{ $stock->product?->name ?? 'Produto removido' }}</td>
                             <td class="px-4 py-2 text-red-700 font-medium">{{ $stock->quantity }}</td>
                             <td class="px-4 py-2">{{ $stock->min_stock }}</td>
                         </tr>
@@ -143,7 +143,7 @@
                     @forelse ($recentMovements as $movement)
                         <tr>
                             <td class="px-4 py-2">{{ $movement->created_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-4 py-2">{{ $movement->product->name }}</td>
+                            <td class="px-4 py-2">{{ $movement->product?->name ?? 'Produto removido' }}</td>
                             <td class="px-4 py-2">
                                 <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $movement->type === 'in' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
                                     {{ $movement->type === 'in' ? 'Entrada' : 'Saída' }}
