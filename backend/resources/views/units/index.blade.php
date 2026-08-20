@@ -10,11 +10,11 @@
         }"
     >
         <div class="mb-4">
-            <p class="text-sm text-stone-600 max-w-2xl">
+            {{-- <p class="text-sm text-stone-600 max-w-2xl">
                 Cada unidade tem seu próprio controle de estoque. Hoje o sistema opera com uma única unidade
                 padrão — cadastrar uma segunda aqui não faz nada usá-la automaticamente em Vendas/Compras/Estoque
                 ainda; isso exige um seletor de loja, que é um passo futuro.
-            </p>
+            </p> --}}
         </div>
 
         <div class="flex items-center justify-between mb-4">
