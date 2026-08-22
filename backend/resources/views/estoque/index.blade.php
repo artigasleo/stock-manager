@@ -29,6 +29,13 @@
                         Baixar modelo
                     </a>
 
+                    <a
+                        href="{{ route('products.export') }}"
+                        class="text-sm text-brand hover:underline cursor-pointer"
+                    >
+                        Exportar produtos cadastrados
+                    </a>
+
                     <form method="POST" action="{{ route('products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
                         @csrf
                         <input

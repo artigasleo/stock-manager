@@ -24,11 +24,13 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller implements HasMiddleware
 {
+    private const IMPORT_HEADER = ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade'];
+
     public static function middleware(): array
     {
         return [
             new Middleware('permission:products.view', only: ['index']),
-            new Middleware('permission:products.edit', only: ['store', 'update', 'destroy', 'import', 'template']),
+            new Middleware('permission:products.edit', only: ['store', 'update', 'destroy', 'import', 'template', 'export']),
         ];
     }
 
@@ -95,7 +97,7 @@ class ProductController extends Controller implements HasMiddleware
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->fromArray([
-            ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade'],
+            self::IMPORT_HEADER,
             ['Chocolate ao Leite 90g', 'CHO001', '7891000001234', 'Chocolates', 'Distribuidora Central', 5.50, 8.99, 40, 5, ''],
         ]);
 
@@ -104,6 +106,46 @@ class ProductController extends Controller implements HasMiddleware
         return response()->streamDownload(function () use ($writer) {
             $writer->save('php://output');
         }, 'modelo-importacao-produtos.xlsx', [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function export(): StreamedResponse
+    {
+        $unit = Unit::default();
+
+        $products = Product::with([
+            'category',
+            'supplier',
+            'stocks' => fn ($query) => $query->where('unit_id', $unit->id),
+        ])->orderBy('name')->get();
+
+        $spreadsheet = new Spreadsheet;
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->fromArray([self::IMPORT_HEADER]);
+
+        foreach ($products as $index => $product) {
+            $stock = $product->stocks->first();
+
+            $sheet->fromArray([[
+                $product->name,
+                $product->code,
+                $product->barcode,
+                $product->category->name,
+                $product->supplier?->name,
+                (float) $product->cost_price,
+                (float) $product->sale_price,
+                $stock?->quantity ?? 0,
+                $stock?->min_stock ?? 0,
+                $product->expiration_date?->format('Y-m-d'),
+            ]], null, 'A'.($index + 2));
+        }
+
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, 'produtos-cadastrados-'.now()->format('Y-m-d').'.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
     }
