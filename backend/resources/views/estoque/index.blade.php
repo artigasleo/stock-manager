@@ -7,6 +7,14 @@
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
             editing: {{ old('editing_id') ? json_encode(['id' => (int) old('editing_id')]) : 'null' }},
+            search: '',
+            matches(name, code, barcode) {
+                if (!this.search) return true;
+                const q = this.search.toLowerCase();
+                return name.toLowerCase().includes(q)
+                    || (code && code.toLowerCase().includes(q))
+                    || (barcode && barcode.toLowerCase().includes(q));
+            },
         }"
     >
         <div class="flex items-center justify-between mb-4">
@@ -46,6 +54,15 @@
             @endcan
         </div>
 
+        <div class="mb-4">
+            <input
+                type="text"
+                x-model="search"
+                placeholder="Buscar por nome, código ou código de barras..."
+                class="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            >
+        </div>
+
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
             <table class="w-full text-sm">
                 <thead class="bg-stone-100 text-left text-stone-600">
@@ -63,7 +80,7 @@
                 </thead>
                 <tbody class="divide-y divide-stone-200">
                     @forelse ($products as $product)
-                        <tr>
+                        <tr x-show="matches(@js($product->name), @js($product->code), @js($product->barcode))">
                             <td class="px-4 py-3">{{ $product->code }}</td>
                             <td class="px-4 py-3">{{ $product->barcode ?? '—' }}</td>
                             <td class="px-4 py-3">{{ $product->name }}</td>
