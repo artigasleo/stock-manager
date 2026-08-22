@@ -26,7 +26,7 @@
                             name="xml_file"
                             accept=".xml"
                             required
-                            class="text-sm rounded-md border border-stone-300 px-2 py-1.5 bg-white"
+                            class="text-sm text-stone-600 rounded-md border border-stone-300 px-2 py-1.5 bg-white cursor-pointer file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-cream hover:file:bg-brand-dark"
                         >
                         <button type="submit" class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer">
                             Importar XML

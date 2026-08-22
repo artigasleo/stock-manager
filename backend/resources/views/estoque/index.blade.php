@@ -7,6 +7,8 @@
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
             editing: {{ old('editing_id') ? json_encode(['id' => (int) old('editing_id')]) : 'null' }},
+            downloadModalOpen: false,
+            importModalOpen: false,
             search: '',
             matches(name, code, barcode) {
                 if (!this.search) return true;
@@ -22,33 +24,21 @@
 
             @can('products.edit')
                 <div class="flex items-center gap-3">
-                    <a
-                        href="{{ route('products.import.template') }}"
-                        class="text-sm text-brand hover:underline cursor-pointer"
+                    <button
+                        type="button"
+                        @click="downloadModalOpen = true"
+                        class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
                     >
-                        Baixar modelo
-                    </a>
+                        Download
+                    </button>
 
-                    <a
-                        href="{{ route('products.export') }}"
-                        class="text-sm text-brand hover:underline cursor-pointer"
+                    <button
+                        type="button"
+                        @click="importModalOpen = true"
+                        class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
                     >
-                        Exportar produtos cadastrados
-                    </a>
-
-                    <form method="POST" action="{{ route('products.import') }}" enctype="multipart/form-data" class="flex items-center gap-2">
-                        @csrf
-                        <input
-                            type="file"
-                            name="xlsx_file"
-                            accept=".xlsx,.xls"
-                            required
-                            class="text-sm rounded-md border border-stone-300 px-2 py-1.5 bg-white"
-                        >
-                        <button type="submit" class="rounded-md border border-brand text-brand px-3 py-1.5 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer">
-                            Importar XLSX
-                        </button>
-                    </form>
+                        Importar XLSX
+                    </button>
 
                     <button
                         type="button"
@@ -335,5 +325,73 @@
                 </form>
             </div>
         </div>
+
+        @can('products.edit')
+            <div
+                x-show="downloadModalOpen"
+                x-cloak
+                class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+                style="display: none;"
+            >
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="downloadModalOpen = false">
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Download</h2>
+
+                    <div class="space-y-3">
+                        <a
+                            href="{{ route('products.import.template') }}"
+                            class="block rounded-md border border-stone-300 px-4 py-3 hover:bg-stone-100 hover:border-brand cursor-pointer transition-colors"
+                        >
+                            <span class="text-sm font-medium text-brand-dark">Baixar modelo</span>
+                            <p class="text-xs text-stone-500 mt-0.5">Planilha em branco com um exemplo, pra usar de base no import.</p>
+                        </a>
+
+                        <a
+                            href="{{ route('products.export') }}"
+                            class="block rounded-md border border-stone-300 px-4 py-3 hover:bg-stone-100 hover:border-brand cursor-pointer transition-colors"
+                        >
+                            <span class="text-sm font-medium text-brand-dark">Exportar produtos cadastrados</span>
+                            <p class="text-xs text-stone-500 mt-0.5">Planilha já preenchida com todos os produtos ativos.</p>
+                        </a>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="button" @click="downloadModalOpen = false" class="px-4 py-2 text-sm cursor-pointer">
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                x-show="importModalOpen"
+                x-cloak
+                class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+                style="display: none;"
+            >
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="importModalOpen = false">
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Importar XLSX</h2>
+
+                    <form method="POST" action="{{ route('products.import') }}" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <input
+                            type="file"
+                            name="xlsx_file"
+                            accept=".xlsx,.xls"
+                            required
+                            class="w-full text-sm text-stone-600 rounded-md border border-stone-300 px-2 py-1.5 bg-white cursor-pointer file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-cream hover:file:bg-brand-dark"
+                        >
+
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" @click="importModalOpen = false" class="px-4 py-2 text-sm cursor-pointer">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer">
+                                Importar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endcan
     </div>
 @endsection
