@@ -38,10 +38,70 @@ class StoreSupplierRequest extends FormRequest
                 'email',
             ],
 
-            'address' => [
+            'zip_code' => [
                 'nullable',
                 'string',
-                'max:255',
+                'max:10',
+            ],
+
+            'street' => [
+                'nullable',
+                'string',
+                'max:150',
+            ],
+
+            'number' => [
+                'nullable',
+                'string',
+                'max:20',
+            ],
+
+            'complement' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'neighborhood' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'city' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'state' => [
+                'nullable',
+                'string',
+                'size:2',
+            ],
+
+            'country' => [
+                'nullable',
+                'string',
+                'max:60',
+            ],
+
+            'instagram' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'state_registration' => [
+                'nullable',
+                'string',
+                'max:30',
+            ],
+
+            'type' => [
+                'nullable',
+                'string',
+                'max:50',
             ],
 
             'active' => [
@@ -57,6 +117,7 @@ class StoreSupplierRequest extends FormRequest
             'name.required' => 'O nome do fornecedor é obrigatório.',
             'document.unique' => 'Já existe um fornecedor com esse documento.',
             'email.email' => 'Informe um e-mail válido.',
+            'state.size' => 'Use a sigla do estado com 2 letras (ex: SP).',
         ];
     }
 }
