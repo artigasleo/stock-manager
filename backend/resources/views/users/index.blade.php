@@ -27,7 +27,7 @@
                     <tr>
                         <th class="px-4 py-3">Nome</th>
                         <th class="px-4 py-3">E-mail</th>
-                        <th class="px-4 py-3">Papéis</th>
+                        <th class="px-4 py-3">Funções</th>
                         <th class="px-4 py-3 w-32">Ações</th>
                     </tr>
                 </thead>
@@ -141,7 +141,7 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Papéis</label>
+                        <label class="block text-sm font-medium mb-1">Funções</label>
                         <div class="space-y-1">
                             @foreach ($roles as $role)
                                 <label class="flex items-center gap-2">

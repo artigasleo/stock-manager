@@ -40,7 +40,7 @@ class RoleController extends Controller implements HasMiddleware
     ): RedirectResponse {
         $action->execute($request);
 
-        return redirect()->route('roles.index')->with('success', 'Papel criado.');
+        return redirect()->route('roles.index')->with('success', 'Função criada.');
     }
 
     public function update(
@@ -50,7 +50,7 @@ class RoleController extends Controller implements HasMiddleware
     ): RedirectResponse {
         $action->execute($request, $role);
 
-        return redirect()->route('roles.index')->with('success', 'Papel atualizado.');
+        return redirect()->route('roles.index')->with('success', 'Função atualizada.');
     }
 
     public function destroy(
@@ -59,6 +59,6 @@ class RoleController extends Controller implements HasMiddleware
     ): RedirectResponse {
         $action->execute($role);
 
-        return redirect()->route('roles.index')->with('success', 'Papel excluído.');
+        return redirect()->route('roles.index')->with('success', 'Função excluída.');
     }
 }

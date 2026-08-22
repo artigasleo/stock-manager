@@ -56,7 +56,7 @@ class UpdateUserRequest extends FormRequest
             'email.email' => 'Informe um e-mail válido.',
             'email.unique' => 'Já existe um usuário com esse e-mail.',
             'password.min' => 'A senha deve possuir no mínimo 8 caracteres.',
-            'roles.*.exists' => 'Um dos papéis informados não existe.',
+            'roles.*.exists' => 'Uma das funções informadas não existe.',
         ];
     }
 }

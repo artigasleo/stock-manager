@@ -8,7 +8,7 @@
         }"
     >
         <div class="flex items-center justify-between mb-4">
-            <h1 class="text-2xl font-semibold text-brand-dark">Papéis</h1>
+            <h1 class="text-2xl font-semibold text-brand-dark">Funções</h1>
 
             @can('users.edit')
                 <button
@@ -16,7 +16,7 @@
                     @click="editing = null; modalOpen = true"
                     class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
                 >
-                    Novo papel
+                    Nova função
                 </button>
             @endcan
         </div>
@@ -52,7 +52,7 @@
                                             method="POST"
                                             action="{{ route('roles.destroy', $role) }}"
                                             class="inline"
-                                            onsubmit="return confirm('Tem certeza que deseja excluir este papel?')"
+                                            onsubmit="return confirm('Tem certeza que deseja excluir esta função?')"
                                         >
                                             @csrf
                                             @method('DELETE')
@@ -67,7 +67,7 @@
                     @empty
                         <tr>
                             <td colspan="4" class="px-4 py-6 text-center text-stone-500">
-                                Nenhum papel cadastrado.
+                                Nenhuma função cadastrada.
                             </td>
                         </tr>
                     @endforelse
@@ -82,7 +82,7 @@
             style="display: none;"
         >
             <div class="w-full max-w-lg bg-brand-paper rounded-lg shadow p-6 my-8" @click.outside="modalOpen = false">
-                <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar papel' : 'Novo papel'"></h2>
+                <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar função' : 'Nova função'"></h2>
 
                 @if ($errors->any())
                     <div class="mb-4 rounded-md bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-sm space-y-1">
@@ -102,7 +102,7 @@
                     <input type="hidden" name="editing_id" :value="editing ? editing.id : ''">
 
                     <div>
-                        <label class="block text-sm font-medium mb-1">Nome do papel</label>
+                        <label class="block text-sm font-medium mb-1">Nome da função</label>
                         <input
                             type="text"
                             name="name"

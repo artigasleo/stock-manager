@@ -44,7 +44,7 @@
                         ['label' => 'Vendas', 'route' => 'sales.index', 'permission' => 'sales.view'],
                         ['label' => 'Unidades', 'route' => 'units.index', 'permission' => 'units.view'],
                         ['label' => 'Usuários', 'route' => 'users.index', 'permission' => 'users.view'],
-                        ['label' => 'Papéis', 'route' => 'roles.index', 'permission' => 'users.view'],
+                        ['label' => 'Funções', 'route' => 'roles.index', 'permission' => 'users.view'],
                     ];
                 @endphp
 

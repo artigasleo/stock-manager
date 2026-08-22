@@ -54,7 +54,7 @@ class StoreUserRequest extends FormRequest
             'email.unique' => 'Já existe um usuário com esse e-mail.',
             'password.required' => 'A senha é obrigatória.',
             'password.min' => 'A senha deve possuir no mínimo 8 caracteres.',
-            'roles.*.exists' => 'Um dos papéis informados não existe.',
+            'roles.*.exists' => 'Uma das funções informadas não existe.',
         ];
     }
 }

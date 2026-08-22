@@ -38,8 +38,8 @@ class UpdateRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'O nome do papel é obrigatório.',
-            'name.unique' => 'Já existe um papel com esse nome.',
+            'name.required' => 'O nome da função é obrigatório.',
+            'name.unique' => 'Já existe uma função com esse nome.',
         ];
     }
 }

@@ -12,13 +12,13 @@ class DeleteRole
     {
         if ($role->name === 'admin') {
             throw ValidationException::withMessages([
-                'role' => 'O papel "admin" não pode ser excluído.',
+                'role' => 'A função "admin" não pode ser excluída.',
             ]);
         }
 
         if (User::role($role->name)->exists()) {
             throw ValidationException::withMessages([
-                'role' => 'Este papel está atribuído a pelo menos um usuário e não pode ser excluído.',
+                'role' => 'Esta função está atribuída a pelo menos um usuário e não pode ser excluída.',
             ]);
         }
 
