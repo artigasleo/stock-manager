@@ -287,7 +287,7 @@
 
                         <div class="space-y-2">
                             <template x-for="(item, index) in items" :key="index">
-                                <div class="grid grid-cols-12 gap-2 items-center">
+                                <div class="grid grid-cols-12 gap-2 items-start">
                                     <select
                                         :name="`items[${index}][product_id]`"
                                         x-model="item.product_id"
@@ -326,12 +326,12 @@
                                         class="col-span-2 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
 
-                                    <span class="col-span-3 text-sm text-right pr-2 text-stone-700" x-text="'R$ ' + itemSubtotal(item)"></span>
+                                    <span class="col-span-3 py-1.5 text-sm text-right pr-2 text-stone-700" x-text="'R$ ' + itemSubtotal(item)"></span>
 
                                     <button
                                         type="button"
                                         @click="removeItem(index)"
-                                        class="col-span-1 text-red-600 hover:underline cursor-pointer text-sm"
+                                        class="col-span-1 py-1.5 text-red-600 hover:underline cursor-pointer text-sm"
                                     >
                                         Remover
                                     </button>
