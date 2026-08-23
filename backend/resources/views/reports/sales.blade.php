@@ -6,7 +6,7 @@
 
         <a
             href="{{ route('reports.index') }}"
-            class="text-sm text-brand hover:underline cursor-pointer"
+            class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
         >
             &larr; Voltar aos relatórios
         </a>
@@ -37,7 +37,7 @@
             type="submit"
             class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
         >
-            Ver vendas
+            Atualizar vendas
         </button>
 
         <button

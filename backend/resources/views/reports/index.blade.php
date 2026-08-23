@@ -20,7 +20,7 @@
         <div class="flex items-center gap-3">
             <a
                 href="{{ route('reports.sales.index') }}"
-                class="text-sm text-brand hover:underline cursor-pointer"
+                class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
             >
                 Vendas detalhadas (com filtro de datas) &rarr;
             </a>
