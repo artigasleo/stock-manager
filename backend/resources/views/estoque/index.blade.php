@@ -5,10 +5,11 @@
 
     <div
         x-data="{
-            modalOpen: {{ $errors->any() ? 'true' : 'false' }},
+            modalOpen: {{ $errors->any() && ! $errors->has('product') && ! $errors->has('xlsx_file') ? 'true' : 'false' }},
             editing: {{ old('editing_id') ? json_encode(['id' => (int) old('editing_id')]) : 'null' }},
             downloadModalOpen: false,
-            importModalOpen: false,
+            importModalOpen: {{ $errors->has('xlsx_file') ? 'true' : 'false' }},
+            deleteErrorModalOpen: {{ $errors->has('product') ? 'true' : 'false' }},
             search: '',
             matches(name, code, barcode) {
                 if (!this.search) return true;
@@ -60,18 +61,36 @@
             >
         </div>
 
+        @php
+            $sortLink = fn (string $column) => route('products.index', [
+                'sort' => $column,
+                'direction' => $sort === $column && $direction === 'asc' ? 'desc' : 'asc',
+            ]);
+            $sortIcon = fn (string $column) => $sort === $column ? ($direction === 'asc' ? '▲' : '▼') : '';
+            $sortableColumns = [
+                'code' => 'Código',
+                'barcode' => 'Cód. Barras',
+                'name' => 'Nome',
+                'category' => 'Categoria',
+                'supplier' => 'Fornecedor',
+                'quantity' => 'Qtd.',
+                'sale_price' => 'Preço de venda',
+                'status' => 'Status',
+            ];
+        @endphp
+
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
             <table class="w-full text-sm">
                 <thead class="bg-stone-100 text-left text-stone-600">
                     <tr>
-                        <th class="px-4 py-3">Código</th>
-                        <th class="px-4 py-3">Cód. Barras</th>
-                        <th class="px-4 py-3">Nome</th>
-                        <th class="px-4 py-3">Categoria</th>
-                        <th class="px-4 py-3">Fornecedor</th>
-                        <th class="px-4 py-3">Qtd.</th>
-                        <th class="px-4 py-3">Preço de venda</th>
-                        <th class="px-4 py-3">Status</th>
+                        @foreach ($sortableColumns as $column => $label)
+                            <th class="px-4 py-3">
+                                <a href="{{ $sortLink($column) }}" class="inline-flex items-center gap-1 hover:text-brand-dark cursor-pointer">
+                                    {{ $label }}
+                                    <span class="text-xs">{{ $sortIcon($column) }}</span>
+                                </a>
+                            </th>
+                        @endforeach
                         <th class="px-4 py-3 w-32">Ações</th>
                     </tr>
                 </thead>
@@ -380,6 +399,9 @@
                             required
                             class="w-full text-sm text-stone-600 rounded-md border border-stone-300 px-2 py-1.5 bg-white cursor-pointer file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-brand-cream hover:file:bg-brand-dark"
                         >
+                        @error('xlsx_file')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
 
                         <div class="flex justify-end gap-2 pt-2">
                             <button type="button" @click="importModalOpen = false" class="px-4 py-2 text-sm cursor-pointer">
@@ -390,6 +412,27 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+
+            <div
+                x-show="deleteErrorModalOpen"
+                x-cloak
+                class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+                style="display: none;"
+            >
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="deleteErrorModalOpen = false">
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Não foi possível excluir</h2>
+
+                    @error('product')
+                        <p class="text-sm text-stone-700">{{ $message }}</p>
+                    @enderror
+
+                    <div class="flex justify-end pt-4">
+                        <button type="button" @click="deleteErrorModalOpen = false" class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer">
+                            Entendi
+                        </button>
+                    </div>
                 </div>
             </div>
         @endcan

@@ -10,8 +10,8 @@
 <body class="bg-brand-cream text-stone-800 antialiased">
     <div class="min-h-screen flex flex-col">
         <header class="bg-brand text-brand-cream shadow">
-            <div class="flex items-center justify-between px-6 py-4">
-                <span class="text-lg font-semibold">Go &amp; Do Emporium</span>
+            <div class="flex items-center justify-between px-6 py-1">
+                <img src="{{ asset('images/logo.png') }}" alt="Go &amp; Do Emporium" class="h-16 w-auto">
 
                 @auth
                     <div class="flex items-center gap-4">

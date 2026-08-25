@@ -33,6 +33,7 @@ class ImportProductsXlsx
         $created = 0;
         $updated = 0;
         $warnings = [];
+        $seenCodes = [];
 
         foreach (array_slice($rows, 1, null, true) as $index => $row) {
             $rowNumber = $index + 1;
@@ -47,6 +48,7 @@ class ImportProductsXlsx
             $initialQuantity = (int) ($this->parseNumber($row[7] ?? null) ?? 0);
             $minStock = (int) ($this->parseNumber($row[8] ?? null) ?? 0);
             $expirationDate = $this->parseDate($row[9] ?? null);
+            $statusRaw = trim((string) ($row[10] ?? ''));
 
             if ($name === '' || $code === '' || $categoryName === '' || $costPrice === null || $salePrice === null) {
                 $warnings[] = "Linha {$rowNumber}: nome, código, categoria, preço de custo e preço de venda são obrigatórios.";
@@ -54,19 +56,45 @@ class ImportProductsXlsx
                 continue;
             }
 
+            $active = true;
+
+            if ($statusRaw !== '') {
+                $normalizedStatus = mb_strtolower($statusRaw);
+
+                if (! in_array($normalizedStatus, ['ativo', 'inativo'], true)) {
+                    $warnings[] = "Linha {$rowNumber}: status \"{$statusRaw}\" inválido (use Ativo ou Inativo).";
+
+                    continue;
+                }
+
+                $active = $normalizedStatus === 'ativo';
+            }
+
+            if (isset($seenCodes[$code])) {
+                $warnings[] = "Linha {$rowNumber}: código \"{$code}\" duplicado na planilha (já usado na linha {$seenCodes[$code]}).";
+
+                continue;
+            }
+
+            $seenCodes[$code] = $rowNumber;
+
             $category = Category::firstOrCreate(['name' => $categoryName], ['active' => true]);
             $supplier = $supplierName !== ''
                 ? Supplier::firstOrCreate(['name' => $supplierName], ['active' => true])
                 : null;
 
-            $product = Product::where('code', $code)->first();
+            $product = Product::withTrashed()->where('code', $code)->first();
 
             $wasCreated = DB::transaction(function () use (
                 $product, $name, $code, $barcode, $category, $supplier,
                 $costPrice, $salePrice, $expirationDate, $minStock,
-                $initialQuantity, $unit, $user
+                $initialQuantity, $active, $unit, $user, $rowNumber, &$warnings
             ) {
                 if ($product) {
+                    if ($product->trashed()) {
+                        $product->restore();
+                    }
+
                     $product->fill([
                         'name' => $name,
                         'barcode' => $barcode,
@@ -75,13 +103,18 @@ class ImportProductsXlsx
                         'expiration_date' => $expirationDate,
                         'cost_price' => $costPrice,
                         'sale_price' => $salePrice,
+                        'active' => $active,
                     ]);
                     $product->save();
 
-                    ProductStock::updateOrCreate(
-                        ['unit_id' => $unit->id, 'product_id' => $product->id],
-                        ['min_stock' => $minStock],
-                    );
+                    $stock = ProductStock::firstOrNew(['unit_id' => $unit->id, 'product_id' => $product->id]);
+                    $currentQuantity = $stock->exists ? $stock->quantity : 0;
+                    $stock->min_stock = $minStock;
+                    $stock->save();
+
+                    if ($initialQuantity !== $currentQuantity) {
+                        $warnings[] = "Linha {$rowNumber}: estoque inicial não foi atualizado (produto já existe, ficou em {$currentQuantity}). Para alterar a quantidade, use Movimentações.";
+                    }
 
                     return false;
                 }
@@ -95,7 +128,7 @@ class ImportProductsXlsx
                     'expiration_date' => $expirationDate,
                     'cost_price' => $costPrice,
                     'sale_price' => $salePrice,
-                    'active' => true,
+                    'active' => $active,
                 ]);
 
                 ProductStock::create([

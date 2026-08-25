@@ -15,6 +15,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
@@ -24,7 +25,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller implements HasMiddleware
 {
-    private const IMPORT_HEADER = ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade'];
+    private const IMPORT_HEADER = ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade', 'Status'];
 
     public static function middleware(): array
     {
@@ -34,12 +35,17 @@ class ProductController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(ListProduct $action): View
+    public function index(Request $request, ListProduct $action): View
     {
+        $sort = $request->string('sort')->value() ?: null;
+        $direction = $request->string('direction')->value() === 'desc' ? 'desc' : 'asc';
+
         return view('estoque.index', [
-            'products' => $action->execute(Unit::default()),
+            'products' => $action->execute(Unit::default(), $sort, $direction),
             'categories' => Category::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
+            'sort' => $sort,
+            'direction' => $direction,
         ]);
     }
 
@@ -98,7 +104,7 @@ class ProductController extends Controller implements HasMiddleware
 
         $sheet->fromArray([
             self::IMPORT_HEADER,
-            ['Chocolate ao Leite 90g', 'CHO001', '7891000001234', 'Chocolates', 'Distribuidora Central', 5.50, 8.99, 40, 5, ''],
+            ['Chocolate ao Leite 90g', 'CHO001', '7891000001234', 'Chocolates', 'Distribuidora Central', 5.50, 8.99, 40, 5, '', 'Ativo'],
         ]);
 
         $writer = new Xlsx($spreadsheet);
@@ -138,6 +144,7 @@ class ProductController extends Controller implements HasMiddleware
                 $stock?->quantity ?? 0,
                 $stock?->min_stock ?? 0,
                 $product->expiration_date?->format('Y-m-d'),
+                $product->active ? 'Ativo' : 'Inativo',
             ]], null, 'A'.($index + 2));
         }
 
