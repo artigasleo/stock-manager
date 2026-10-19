@@ -57,6 +57,7 @@ class ImportProductsXlsx
             $minStock = (int) ($this->parseNumber($row[8] ?? null) ?? 0);
             $expirationDate = $this->parseDate($row[9] ?? null);
             $statusRaw = trim((string) ($row[10] ?? ''));
+            $ncmRaw = trim((string) ($row[11] ?? ''));
 
             if ($name === '' || $code === '' || $categoryName === '' || $costPrice === null || $salePrice === null) {
                 $warnings[] = "Linha {$rowNumber}: nome, código, categoria, preço de custo e preço de venda são obrigatórios.";
@@ -89,6 +90,18 @@ class ImportProductsXlsx
                 }
 
                 $active = $normalizedStatus === 'ativo';
+            }
+
+            $ncm = null;
+
+            if ($ncmRaw !== '') {
+                if (! ctype_digit($ncmRaw) || strlen($ncmRaw) !== 8) {
+                    $warnings[] = "Linha {$rowNumber}: NCM \"{$ncmRaw}\" inválido (precisa ter exatamente 8 dígitos numéricos).";
+
+                    continue;
+                }
+
+                $ncm = $ncmRaw;
             }
 
             if (isset($seenCodes[$code])) {
@@ -124,7 +137,7 @@ class ImportProductsXlsx
                 $wasCreated = $this->importRow(
                     $code, $name, $barcode, $categoryName, $supplierName,
                     $costPrice, $salePrice, $expirationDate, $minStock,
-                    $initialQuantity, $active, $unit, $user, $rowNumber, $warnings
+                    $initialQuantity, $active, $ncm, $unit, $user, $rowNumber, $warnings
                 );
             } catch (QueryException $e) {
                 Log::error("Importação XLSX: falha na linha {$rowNumber}", ['exception' => $e]);
@@ -149,12 +162,12 @@ class ImportProductsXlsx
     private function importRow(
         string $code, string $name, ?string $barcode, string $categoryName, string $supplierName,
         float $costPrice, float $salePrice, ?string $expirationDate, int $minStock,
-        int $initialQuantity, bool $active, Unit $unit, User $user, int $rowNumber, array &$warnings
+        int $initialQuantity, bool $active, ?string $ncm, Unit $unit, User $user, int $rowNumber, array &$warnings
     ): bool {
         return DB::transaction(function () use (
             $code, $name, $barcode, $categoryName, $supplierName,
             $costPrice, $salePrice, $expirationDate, $minStock,
-            $initialQuantity, $active, $unit, $user, $rowNumber, &$warnings
+            $initialQuantity, $active, $ncm, $unit, $user, $rowNumber, &$warnings
         ) {
             $category = Category::firstOrCreate(['name' => $categoryName], ['active' => true]);
             $supplier = $supplierName !== ''
@@ -177,6 +190,7 @@ class ImportProductsXlsx
                     'cost_price' => $costPrice,
                     'sale_price' => $salePrice,
                     'active' => $active,
+                    ...($ncm !== null ? ['ncm' => $ncm] : []),
                 ]);
                 $product->save();
 
@@ -202,6 +216,7 @@ class ImportProductsXlsx
                 'cost_price' => $costPrice,
                 'sale_price' => $salePrice,
                 'active' => $active,
+                'ncm' => $ncm,
             ]);
 
             ProductStock::create([

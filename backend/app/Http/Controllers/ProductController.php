@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller implements HasMiddleware
 {
-    private const IMPORT_HEADER = ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade', 'Status'];
+    private const IMPORT_HEADER = ['Nome', 'Código', 'Código de Barras', 'Categoria', 'Fornecedor', 'Preço de Custo', 'Preço de Venda', 'Estoque Inicial', 'Estoque Mínimo', 'Validade', 'Status', 'NCM'];
 
     public static function middleware(): array
     {
@@ -104,7 +104,7 @@ class ProductController extends Controller implements HasMiddleware
 
         $sheet->fromArray([
             self::IMPORT_HEADER,
-            ['Chocolate ao Leite 90g', 'CHO001', '7891000001234', 'Chocolates', 'Distribuidora Central', 5.50, 8.99, 40, 5, '', 'Ativo'],
+            ['Chocolate ao Leite 90g', 'CHO001', '7891000001234', 'Chocolates', 'Distribuidora Central', 5.50, 8.99, 40, 5, '', 'Ativo', '18063100'],
         ]);
 
         $writer = new Xlsx($spreadsheet);
@@ -145,6 +145,7 @@ class ProductController extends Controller implements HasMiddleware
                 $stock?->min_stock ?? 0,
                 $product->expiration_date?->format('Y-m-d'),
                 $product->active ? 'Ativo' : 'Inativo',
+                $product->ncm,
             ]], null, 'A'.($index + 2));
         }
 
