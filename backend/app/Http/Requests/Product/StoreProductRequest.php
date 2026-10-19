@@ -79,6 +79,38 @@ class StoreProductRequest extends FormRequest
                 'sometimes',
                 'boolean',
             ],
+
+            'ncm' => [
+                'nullable',
+                'digits:8',
+            ],
+
+            'cest' => [
+                'nullable',
+                'digits:7',
+            ],
+
+            'cfop' => [
+                'nullable',
+                'digits:4',
+            ],
+
+            'csosn' => [
+                'nullable',
+                'digits:3',
+            ],
+
+            'unidade_comercial' => [
+                'nullable',
+                'string',
+                'max:6',
+            ],
+
+            'origem' => [
+                'nullable',
+                'integer',
+                'between:0,8',
+            ],
         ];
     }
 
@@ -94,6 +126,10 @@ class StoreProductRequest extends FormRequest
             'supplier_id.exists' => 'O fornecedor informado não existe.',
             'cost_price.required' => 'O preço de custo é obrigatório.',
             'sale_price.required' => 'O preço de venda é obrigatório.',
+            'ncm.digits' => 'O NCM deve ter 8 dígitos.',
+            'cest.digits' => 'O CEST deve ter 7 dígitos.',
+            'cfop.digits' => 'O CFOP deve ter 4 dígitos.',
+            'csosn.digits' => 'O CSOSN deve ter 3 dígitos.',
         ];
     }
 }

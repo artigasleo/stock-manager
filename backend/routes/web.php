@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('sales', SaleController::class)->only(['index', 'store']);
     Route::patch('/sales/{sale}/status', [SaleController::class, 'updateStatus'])->name('sales.updateStatus');
+    Route::post('/sales/{sale}/nfce', [SaleController::class, 'emitNfce'])->name('sales.nfce.emit');
 
     Route::resource('users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('roles', RoleController::class)->only(['index', 'store', 'update', 'destroy']);

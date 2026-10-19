@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'address', 'is_default', 'active'])]
+#[Fillable(['name', 'address', 'is_default', 'active', 'nfce_serie', 'nfce_next_number'])]
 class Unit extends Model
 {
     protected function casts(): array

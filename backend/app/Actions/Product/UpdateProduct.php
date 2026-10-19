@@ -21,6 +21,12 @@ class UpdateProduct
             'cost_price' => $request->validated('cost_price'),
             'sale_price' => $request->validated('sale_price'),
             'active' => $request->validated('active') ?? $product->active,
+            'ncm' => $request->validated('ncm'),
+            'cest' => $request->validated('cest'),
+            'cfop' => $request->validated('cfop'),
+            'csosn' => $request->validated('csosn'),
+            'unidade_comercial' => $request->validated('unidade_comercial') ?? 'UN',
+            'origem' => $request->validated('origem') ?? 0,
         ]);
 
         $product->save();

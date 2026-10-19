@@ -135,6 +135,7 @@
                         <th class="px-4 py-3">Total</th>
                         <th class="px-4 py-3">Vendedor</th>
                         <th class="px-4 py-3 w-44">Status</th>
+                        <th class="px-4 py-3 w-56">Nota Fiscal</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
@@ -167,10 +168,44 @@
                                     </form>
                                 @endif
                             </td>
+                            <td class="px-4 py-3">
+                                @if ($sale->nfce?->status === 'authorized')
+                                    <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium bg-green-100 text-green-800 mb-1">
+                                        Autorizada
+                                    </span>
+                                    <p class="text-xs text-stone-500 break-all">{{ $sale->nfce->chave_acesso }}</p>
+                                @elseif ($sale->nfce && in_array($sale->nfce->status, ['rejected', 'error']))
+                                    <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium bg-red-100 text-red-800 mb-1">
+                                        {{ $sale->nfce->status === 'rejected' ? 'Rejeitada' : 'Erro' }}
+                                    </span>
+                                    <p class="text-xs text-stone-500">{{ $sale->nfce->motivo ?? $sale->nfce->erro }}</p>
+                                    @can('sales.edit')
+                                        <form method="POST" action="{{ route('sales.nfce.emit', $sale) }}" class="mt-1">
+                                            @csrf
+                                            <button type="submit" class="text-brand hover:underline cursor-pointer text-xs">
+                                                Tentar novamente
+                                            </button>
+                                        </form>
+                                    @endcan
+                                @elseif ($sale->status !== 'cancelled')
+                                    @can('sales.edit')
+                                        <form method="POST" action="{{ route('sales.nfce.emit', $sale) }}">
+                                            @csrf
+                                            <button type="submit" class="rounded-md border border-brand text-brand px-3 py-1 text-xs font-medium hover:bg-brand hover:text-brand-cream cursor-pointer">
+                                                Emitir NFC-e
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span class="text-xs text-stone-500">—</span>
+                                    @endcan
+                                @else
+                                    <span class="text-xs text-stone-500">—</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-6 text-center text-stone-500">
+                            <td colspan="8" class="px-4 py-6 text-center text-stone-500">
                                 Nenhuma venda registrada.
                             </td>
                         </tr>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Nfce\EmitNfce;
 use App\Actions\Sale\CreateSale;
 use App\Actions\Sale\ListSale;
 use App\Actions\Sale\UpdateSaleStatus;
@@ -23,7 +24,7 @@ class SaleController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:sales.view', only: ['index']),
-            new Middleware('permission:sales.edit', only: ['store', 'updateStatus']),
+            new Middleware('permission:sales.edit', only: ['store', 'updateStatus', 'emitNfce']),
         ];
     }
 
@@ -58,5 +59,18 @@ class SaleController extends Controller implements HasMiddleware
         $action->execute($request, $sale, $request->user());
 
         return redirect()->route('sales.index')->with('success', 'Status da venda atualizado.');
+    }
+
+    public function emitNfce(Sale $sale, EmitNfce $action): RedirectResponse
+    {
+        $sale->load('items.product', 'customer', 'unit');
+
+        $nfce = $action->execute($sale);
+
+        return match ($nfce->status) {
+            'authorized' => redirect()->route('sales.index')->with('success', 'NFC-e autorizada.'),
+            'rejected' => redirect()->route('sales.index')->with('warning', "NFC-e rejeitada: {$nfce->motivo}"),
+            default => redirect()->route('sales.index')->with('warning', "Falha ao emitir NFC-e: {$nfce->erro}"),
+        };
     }
 }

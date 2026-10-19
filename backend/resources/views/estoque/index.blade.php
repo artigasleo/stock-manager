@@ -320,6 +320,103 @@
                         </div>
                     </div>
 
+                    <div class="border-t border-stone-200 pt-4">
+                        <p class="text-sm font-medium text-brand-dark mb-3">Dados fiscais (NFC-e)</p>
+
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">NCM</label>
+                                <input
+                                    type="text"
+                                    name="ncm"
+                                    maxlength="8"
+                                    :value="editing && editing.ncm !== undefined ? editing.ncm : '{{ old('ncm') }}'"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                @error('ncm')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-1">CEST (opcional)</label>
+                                <input
+                                    type="text"
+                                    name="cest"
+                                    maxlength="7"
+                                    :value="editing && editing.cest !== undefined ? editing.cest : '{{ old('cest') }}'"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                @error('cest')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Unidade</label>
+                                <input
+                                    type="text"
+                                    name="unidade_comercial"
+                                    maxlength="6"
+                                    placeholder="UN"
+                                    :value="editing && editing.unidade_comercial !== undefined ? editing.unidade_comercial : '{{ old('unidade_comercial', 'UN') }}'"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                @error('unidade_comercial')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">CFOP (opcional)</label>
+                                <input
+                                    type="text"
+                                    name="cfop"
+                                    maxlength="4"
+                                    placeholder="5102"
+                                    :value="editing && editing.cfop !== undefined ? editing.cfop : '{{ old('cfop') }}'"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                @error('cfop')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-1">CSOSN (opcional)</label>
+                                <input
+                                    type="text"
+                                    name="csosn"
+                                    maxlength="3"
+                                    placeholder="102"
+                                    :value="editing && editing.csosn !== undefined ? editing.csosn : '{{ old('csosn') }}'"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                @error('csosn')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Origem</label>
+                                <select
+                                    name="origem"
+                                    :value="editing && editing.origem !== undefined ? editing.origem : undefined"
+                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                                    @foreach (range(0, 8) as $code)
+                                        <option value="{{ $code }}" @selected((int) old('origem', 0) === $code)>{{ $code }}</option>
+                                    @endforeach
+                                </select>
+                                @error('origem')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex items-center gap-2">
                         <input type="hidden" name="active" value="0">
                         <input

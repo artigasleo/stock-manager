@@ -19,6 +19,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'cost_price',
     'sale_price',
     'active',
+    'ncm',
+    'cest',
+    'cfop',
+    'csosn',
+    'unidade_comercial',
+    'origem',
 ])]
 class Product extends Model
 {
@@ -31,6 +37,7 @@ class Product extends Model
             'cost_price' => 'decimal:2',
             'sale_price' => 'decimal:2',
             'active' => 'boolean',
+            'origem' => 'integer',
         ];
     }
 
