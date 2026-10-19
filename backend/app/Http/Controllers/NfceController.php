@@ -31,7 +31,10 @@ class NfceController extends Controller implements HasMiddleware
             ->whereNotNull('xml_path')
             ->get();
 
-        $zipPath = tempnam(sys_get_temp_dir(), 'nfce').'.zip';
+        $relativeZipPath = 'nfce-exports/'.uniqid('nfce-', true).'.zip';
+        Storage::makeDirectory('nfce-exports');
+        $zipPath = Storage::path($relativeZipPath);
+
         $zip = new ZipArchive;
         $zip->open($zipPath, ZipArchive::CREATE);
 
@@ -43,9 +46,9 @@ class NfceController extends Controller implements HasMiddleware
 
         $zip->close();
 
-        return response()->streamDownload(function () use ($zipPath) {
-            readfile($zipPath);
-            unlink($zipPath);
+        return response()->streamDownload(function () use ($relativeZipPath) {
+            readfile(Storage::path($relativeZipPath));
+            Storage::delete($relativeZipPath);
         }, "nfce-{$month}.zip", [
             'Content-Type' => 'application/zip',
         ]);
