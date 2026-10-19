@@ -85,9 +85,9 @@ class NfceXmlBuilder
         $nfe->tagpag($pag);
 
         $detPag = new \stdClass;
-        $detPag->indPag = 0; // à vista
         $detPag->tPag = self::PAYMENT_CODES[$sale->payment_method] ?? '99';
         $detPag->vPag = (float) $sale->total;
+        $detPag->tpIntegra = 2; // pagamento não integrado (sem TEF/POS conectado ao sistema)
         $nfe->tagdetPag($detPag);
 
         return $nfe->getXML();

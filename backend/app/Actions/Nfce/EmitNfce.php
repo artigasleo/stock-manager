@@ -52,6 +52,7 @@ class EmitNfce
                 'cstat' => null,
                 'motivo' => null,
                 'xml_path' => null,
+                'qrcode_url' => null,
                 'erro' => null,
             ],
         );
@@ -84,6 +85,7 @@ class EmitNfce
                     'cstat' => $cstat,
                     'motivo' => $motivo,
                     'xml_path' => $path,
+                    'qrcode_url' => $this->extractQrCodeUrl($authorized),
                 ]);
             } else {
                 $nfce->update([
@@ -100,6 +102,15 @@ class EmitNfce
         }
 
         return $nfce->fresh();
+    }
+
+    private function extractQrCodeUrl(string $xml): ?string
+    {
+        if (! preg_match('/<qrCode>(.*?)<\/qrCode>/s', $xml, $matches)) {
+            return null;
+        }
+
+        return trim(str_replace(['<![CDATA[', ']]>'], '', $matches[1]));
     }
 
     private function makeTools(): Tools

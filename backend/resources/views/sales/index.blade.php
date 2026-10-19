@@ -15,6 +15,10 @@
         'cancelled' => 'bg-red-100 text-red-800',
     ];
 
+    // "Faturada" só é alcançada automaticamente quando a NFC-e é autorizada
+    // (ver UpdateSaleStatus), por isso fica fora das opções escolhíveis aqui.
+    $selectableStatusLabels = collect($statusLabels)->except('invoiced');
+
     $paymentLabels = [
         'cash' => 'Dinheiro',
         'pix' => 'PIX',
@@ -49,6 +53,7 @@
     <div
         x-data="{
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
+            nfceExportModalOpen: false,
             unitId: {{ old('unit_id', $defaultUnit->id) }},
             items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '' }]" }},
             barcodeError: '',
@@ -114,13 +119,23 @@
             <h1 class="text-2xl font-semibold text-brand-dark">Vendas</h1>
 
             @can('sales.edit')
-                <button
-                    type="button"
-                    @click="modalOpen = true"
-                    class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
-                >
-                    Nova venda
-                </button>
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        @click="nfceExportModalOpen = true"
+                        class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
+                    >
+                        NFC-e do mês
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="modalOpen = true"
+                        class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
+                    >
+                        Nova venda
+                    </button>
+                </div>
             @endcan
         </div>
 
@@ -148,7 +163,7 @@
                             <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
                             <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                             <td class="px-4 py-3">
-                                @if ($sale->status === 'cancelled' || ! auth()->user()->can('sales.edit'))
+                                @if (in_array($sale->status, ['cancelled', 'invoiced']) || ! auth()->user()->can('sales.edit'))
                                     <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium {{ $statusColors[$sale->status] }}">
                                         {{ $statusLabels[$sale->status] }}
                                     </span>
@@ -161,7 +176,7 @@
                                             onchange="this.form.submit()"
                                             class="rounded-md border border-stone-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand {{ $statusColors[$sale->status] }}"
                                         >
-                                            @foreach ($statusLabels as $value => $label)
+                                            @foreach ($selectableStatusLabels as $value => $label)
                                                 <option value="{{ $value }}" @selected($sale->status === $value)>{{ $label }}</option>
                                             @endforeach
                                         </select>
@@ -174,6 +189,16 @@
                                         Autorizada
                                     </span>
                                     <p class="text-xs text-stone-500 break-all">{{ $sale->nfce->chave_acesso }}</p>
+                                    @if ($sale->nfce->qrcode_url)
+                                        <a
+                                            href="{{ $sale->nfce->qrcode_url }}"
+                                            target="_blank"
+                                            rel="noopener"
+                                            class="text-brand hover:underline cursor-pointer text-xs"
+                                        >
+                                            Ver / Imprimir
+                                        </a>
+                                    @endif
                                 @elseif ($sale->nfce && in_array($sale->nfce->status, ['rejected', 'error']))
                                     <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium bg-red-100 text-red-800 mb-1">
                                         {{ $sale->nfce->status === 'rejected' ? 'Rejeitada' : 'Erro' }}
@@ -392,5 +417,40 @@
                 </form>
             </div>
         </div>
+
+        @can('sales.edit')
+            <div
+                x-show="nfceExportModalOpen"
+                x-cloak
+                class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+                style="display: none;"
+            >
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="nfceExportModalOpen = false">
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">NFC-e do mês</h2>
+                    <p class="text-sm text-stone-600 mb-4">Baixa um ZIP com o XML de todas as NFC-e autorizadas no mês escolhido, pra enviar à contabilidade.</p>
+
+                    <form method="GET" action="{{ route('nfce.export') }}" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Mês</label>
+                            <input
+                                type="month"
+                                name="month"
+                                value="{{ now()->subMonthNoOverflow()->format('Y-m') }}"
+                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
+
+                        <div class="flex justify-end gap-2 pt-2">
+                            <button type="button" @click="nfceExportModalOpen = false" class="px-4 py-2 text-sm cursor-pointer">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer">
+                                Baixar ZIP
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endcan
     </div>
 @endsection

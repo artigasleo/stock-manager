@@ -2,6 +2,7 @@
 
 namespace App\Actions\Sale;
 
+use App\Actions\Nfce\EmitNfce;
 use App\Actions\Stock\CreateStockMovement;
 use App\Http\Requests\Sale\UpdateSaleStatusRequest;
 use App\Models\Sale;
@@ -12,7 +13,8 @@ use Illuminate\Validation\ValidationException;
 class UpdateSaleStatus
 {
     public function __construct(
-        private CreateStockMovement $createStockMovement
+        private CreateStockMovement $createStockMovement,
+        private EmitNfce $emitNfce
     ) {}
 
     public function execute(UpdateSaleStatusRequest $request, Sale $sale, User $user): Sale
@@ -41,7 +43,15 @@ class UpdateSaleStatus
 
             $sale->update(['status' => $newStatus]);
 
-            return $sale;
+            if ($newStatus === 'paid') {
+                $nfce = $this->emitNfce->execute($sale->load('items.product', 'customer', 'unit'));
+
+                if ($nfce->status === 'authorized') {
+                    $sale->update(['status' => 'invoiced']);
+                }
+            }
+
+            return $sale->fresh();
         });
     }
 }

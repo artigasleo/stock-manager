@@ -67,6 +67,10 @@ class SaleController extends Controller implements HasMiddleware
 
         $nfce = $action->execute($sale);
 
+        if ($nfce->status === 'authorized' && $sale->status !== 'invoiced') {
+            $sale->update(['status' => 'invoiced']);
+        }
+
         return match ($nfce->status) {
             'authorized' => redirect()->route('sales.index')->with('success', 'NFC-e autorizada.'),
             'rejected' => redirect()->route('sales.index')->with('warning', "NFC-e rejeitada: {$nfce->motivo}"),

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'cstat',
     'motivo',
     'xml_path',
+    'qrcode_url',
     'erro',
 ])]
 class Nfce extends Model
