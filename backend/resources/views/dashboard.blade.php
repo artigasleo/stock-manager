@@ -80,6 +80,35 @@
         </div>
 
         <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+            <div class="px-4 py-3 border-b border-stone-200">
+                <h2 class="font-semibold text-brand-dark">Produtos com mais faturamento ({{ $period === 'day' ? 'hoje' : 'no mês' }})</h2>
+            </div>
+
+            <table class="w-full text-sm">
+                <thead class="bg-stone-100 text-left text-stone-600">
+                    <tr>
+                        <th class="px-4 py-2">Produto</th>
+                        <th class="px-4 py-2">Faturamento</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-stone-200">
+                    @forelse ($topRevenueProducts as $row)
+                        <tr>
+                            <td class="px-4 py-2">{{ $row->product?->name ?? 'Produto removido' }}</td>
+                            <td class="px-4 py-2 font-medium">R$ {{ number_format($row->total_revenue, 2, ',', '.') }}</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="2" class="px-4 py-6 text-center text-stone-500">
+                                Nenhuma venda registrada {{ $period === 'day' ? 'hoje' : 'no mês' }}.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
             <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
                 <h2 class="font-semibold text-brand-dark">Formas de pagamento</h2>
 
