@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductStock;
 use App\Models\Sale;
+use App\Models\SaleItem;
 use App\Models\StockMovement;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -51,6 +52,15 @@ class DashboardController extends Controller implements HasMiddleware
             ->orderByDesc('total')
             ->get();
 
+        $topSellingProducts = SaleItem::query()
+            ->joinSub((clone $salesForPeriod)->select('id'), 'period_sales', 'period_sales.id', '=', 'sale_items.sale_id')
+            ->selectRaw('sale_items.product_id, sum(sale_items.quantity) as total_quantity, sum(sale_items.quantity * sale_items.unit_price) as total_revenue')
+            ->groupBy('sale_items.product_id')
+            ->orderByDesc('total_quantity')
+            ->with('product')
+            ->limit(5)
+            ->get();
+
         return view('dashboard', [
             'salesTodayCount' => $salesToday->count(),
             'salesTodayTotal' => $salesToday->sum('total'),
@@ -60,6 +70,7 @@ class DashboardController extends Controller implements HasMiddleware
             'stockValue' => $stockValue,
             'period' => $period,
             'paymentMethodBreakdown' => $paymentMethodBreakdown,
+            'topSellingProducts' => $topSellingProducts,
             'recentMovements' => StockMovement::with('product')->latest()->limit(8)->get(),
         ]);
     }

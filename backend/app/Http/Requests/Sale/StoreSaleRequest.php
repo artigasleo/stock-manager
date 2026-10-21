@@ -33,7 +33,7 @@ class StoreSaleRequest extends FormRequest
             ],
 
             'payment_method' => [
-                'nullable',
+                'required',
                 'string',
                 'in:cash,pix,debit_card,credit_card,other',
             ],
@@ -73,6 +73,7 @@ class StoreSaleRequest extends FormRequest
             'customer_id.exists' => 'O cliente informado não existe.',
             'seller_id.required' => 'O vendedor é obrigatório.',
             'seller_id.exists' => 'O vendedor informado não existe.',
+            'payment_method.required' => 'A forma de pagamento é obrigatória.',
             'payment_method.in' => 'Forma de pagamento inválida.',
             'items.required' => 'Adicione ao menos um item.',
             'items.min' => 'Adicione ao menos um item.',
