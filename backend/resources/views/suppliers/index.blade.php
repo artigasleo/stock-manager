@@ -88,10 +88,10 @@
         <div
             x-show="modalOpen"
             x-cloak
-            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+            class="fixed inset-0 bg-black/40 flex items-start justify-center p-4 overflow-y-auto"
             style="display: none;"
         >
-            <div class="w-full max-w-md bg-brand-paper rounded-lg shadow p-6" @click.outside="modalOpen = false">
+            <div class="w-full max-w-2xl bg-brand-paper rounded-lg shadow p-6 my-8">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar fornecedor' : 'Novo fornecedor'"></h2>
 
                 <form
@@ -103,56 +103,48 @@
                     <input type="hidden" name="_method" :value="editing ? 'PUT' : 'POST'">
                     <input type="hidden" name="editing_id" :value="editing ? editing.id : ''">
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nome</label>
-                        <input
-                            type="text"
-                            name="name"
-                            :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium mb-1">Nome</label>
+                            <input
+                                type="text"
+                                name="name"
+                                :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
+                                class="w-full rounded-md border {{ $errors->has('name') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium mb-1">CNPJ/CPF</label>
+                            <input
+                                type="text"
+                                name="document"
+                                :value="editing && editing.document !== undefined ? editing.document : '{{ old('document') }}'"
+                                class="w-full rounded-md border {{ $errors->has('document') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">CNPJ/CPF</label>
-                        <input
-                            type="text"
-                            name="document"
-                            :value="editing && editing.document !== undefined ? editing.document : '{{ old('document') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('document')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Telefone</label>
+                            <input
+                                type="text"
+                                name="phone"
+                                :value="editing && editing.phone !== undefined ? editing.phone : '{{ old('phone') }}'"
+                                class="w-full rounded-md border {{ $errors->has('phone') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Telefone</label>
-                        <input
-                            type="text"
-                            name="phone"
-                            :value="editing && editing.phone !== undefined ? editing.phone : '{{ old('phone') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('phone')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium mb-1">E-mail</label>
-                        <input
-                            type="email"
-                            name="email"
-                            :value="editing && editing.email !== undefined ? editing.email : '{{ old('email') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('email')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                        <div>
+                            <label class="block text-sm font-medium mb-1">E-mail</label>
+                            <input
+                                type="email"
+                                name="email"
+                                :value="editing && editing.email !== undefined ? editing.email : '{{ old('email') }}'"
+                                class="w-full rounded-md border {{ $errors->has('email') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-4">
@@ -162,11 +154,8 @@
                                 type="text"
                                 name="zip_code"
                                 :value="editing && editing.zip_code !== undefined ? editing.zip_code : '{{ old('zip_code') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('zip_code') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('zip_code')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div class="col-span-2">
@@ -175,11 +164,8 @@
                                 type="text"
                                 name="street"
                                 :value="editing && editing.street !== undefined ? editing.street : '{{ old('street') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('street') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('street')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -190,11 +176,8 @@
                                 type="text"
                                 name="number"
                                 :value="editing && editing.number !== undefined ? editing.number : '{{ old('number') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('number') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('number')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -203,11 +186,8 @@
                                 type="text"
                                 name="complement"
                                 :value="editing && editing.complement !== undefined ? editing.complement : '{{ old('complement') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('complement') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('complement')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -218,11 +198,8 @@
                                 type="text"
                                 name="neighborhood"
                                 :value="editing && editing.neighborhood !== undefined ? editing.neighborhood : '{{ old('neighborhood') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('neighborhood') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('neighborhood')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -233,11 +210,8 @@
                                 maxlength="2"
                                 placeholder="SP"
                                 :value="editing && editing.state !== undefined ? editing.state : '{{ old('state') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('state') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('state')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -248,11 +222,8 @@
                                 type="text"
                                 name="city"
                                 :value="editing && editing.city !== undefined ? editing.city : '{{ old('city') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('city') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('city')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -261,11 +232,8 @@
                                 type="text"
                                 name="country"
                                 :value="editing && editing.country !== undefined ? editing.country : '{{ old('country', 'Brasil') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('country') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('country')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -277,11 +245,8 @@
                                 name="instagram"
                                 placeholder="@usuario"
                                 :value="editing && editing.instagram !== undefined ? editing.instagram : '{{ old('instagram') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('instagram') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('instagram')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -290,11 +255,8 @@
                                 type="text"
                                 name="state_registration"
                                 :value="editing && editing.state_registration !== undefined ? editing.state_registration : '{{ old('state_registration') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('state_registration') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('state_registration')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -305,11 +267,8 @@
                             name="type"
                             placeholder="Ex: Distribuidor, Fabricante, Atacadista..."
                             :value="editing && editing.type !== undefined ? editing.type : '{{ old('type') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            class="w-full rounded-md border {{ $errors->has('type') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                         >
-                        @error('type')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <div class="flex items-center gap-2">

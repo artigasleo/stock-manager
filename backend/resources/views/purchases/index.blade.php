@@ -77,10 +77,10 @@
         <div
             x-show="modalOpen"
             x-cloak
-            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 overflow-y-auto"
+            class="fixed inset-0 bg-black/40 flex items-start justify-center p-4 overflow-y-auto"
             style="display: none;"
         >
-            <div class="w-full max-w-2xl bg-brand-paper rounded-lg shadow p-6 my-8" @click.outside="modalOpen = false">
+            <div class="w-full max-w-2xl bg-brand-paper rounded-lg shadow p-6 my-8">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4">Nova compra</h2>
 
                 @if ($errors->any())
@@ -214,7 +214,7 @@
                 class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
                 style="display: none;"
             >
-                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="importModalOpen = false">
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Importar XML</h2>
 
                     <form method="POST" action="{{ route('purchases.import') }}" enctype="multipart/form-data" class="space-y-4">

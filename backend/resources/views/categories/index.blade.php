@@ -83,7 +83,7 @@
             class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
             style="display: none;"
         >
-            <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="modalOpen = false">
+            <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar categoria' : 'Nova categoria'"></h2>
 
                 <form

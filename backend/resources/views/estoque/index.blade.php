@@ -148,10 +148,10 @@
         <div
             x-show="modalOpen"
             x-cloak
-            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4 overflow-y-auto"
+            class="fixed inset-0 bg-black/40 flex items-start justify-center p-4 overflow-y-auto"
             style="display: none;"
         >
-            <div class="w-full max-w-lg bg-brand-paper rounded-lg shadow p-6 my-8" @click.outside="modalOpen = false">
+            <div class="w-full max-w-2xl bg-brand-paper rounded-lg shadow p-6 my-8">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar produto' : 'Novo produto'"></h2>
 
                 <form
@@ -163,54 +163,45 @@
                     <input type="hidden" name="_method" :value="editing ? 'PUT' : 'POST'">
                     <input type="hidden" name="editing_id" :value="editing ? editing.id : ''">
 
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nome</label>
-                        <input
-                            type="text"
-                            name="name"
-                            :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
-                            class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                        >
-                        @error('name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium mb-1">Nome</label>
+                            <input
+                                type="text"
+                                name="name"
+                                :value="editing && editing.name !== undefined ? editing.name : '{{ old('name') }}'"
+                                class="w-full rounded-md border {{ $errors->has('name') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                            >
+                        </div>
 
-                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Código</label>
                             <input
                                 type="text"
                                 name="code"
                                 :value="editing && editing.code !== undefined ? editing.code : '{{ old('code') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('code') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('code')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Código de barras</label>
                             <input
                                 type="text"
                                 name="barcode"
                                 :value="editing && editing.barcode !== undefined ? editing.barcode : '{{ old('barcode') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('barcode') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('barcode')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Categoria</label>
                             <select
                                 name="category_id"
                                 :value="editing && editing.category_id !== undefined ? editing.category_id : undefined"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('category_id') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
                                 <option value="" disabled @selected(!old('category_id'))>Selecione...</option>
                                 @foreach ($categories as $category)
@@ -219,9 +210,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('category_id')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -229,7 +217,7 @@
                             <select
                                 name="supplier_id"
                                 :value="editing && editing.supplier_id !== undefined ? editing.supplier_id : undefined"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('supplier_id') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
                                 <option value="" @selected(!old('supplier_id'))>Nenhum</option>
                                 @foreach ($suppliers as $supplier)
@@ -238,9 +226,6 @@
                                     </option>
                                 @endforeach
                             </select>
-                            @error('supplier_id')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -252,11 +237,8 @@
                                 min="0"
                                 name="quantity"
                                 :value="old('quantity', 0)"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('quantity') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('quantity')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                             <p class="mt-1 text-xs text-stone-500">Gera uma movimentação de entrada ao criar o produto.</p>
                         </div>
 
@@ -267,11 +249,8 @@
                                 min="0"
                                 name="min_stock"
                                 :value="editing && editing.stocks && editing.stocks[0] ? editing.stocks[0].min_stock : '{{ old('min_stock', 0) }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('min_stock') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('min_stock')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -280,11 +259,8 @@
                                 type="date"
                                 name="expiration_date"
                                 :value="editing && editing.expiration_date !== undefined ? (editing.expiration_date ? editing.expiration_date.substring(0, 10) : '') : '{{ old('expiration_date') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('expiration_date') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('expiration_date')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -297,11 +273,8 @@
                                 step="0.01"
                                 name="cost_price"
                                 :value="editing && editing.cost_price !== undefined ? editing.cost_price : '{{ old('cost_price') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('cost_price') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('cost_price')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
 
                         <div>
@@ -312,11 +285,8 @@
                                 step="0.01"
                                 name="sale_price"
                                 :value="editing && editing.sale_price !== undefined ? editing.sale_price : '{{ old('sale_price') }}'"
-                                class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                class="w-full rounded-md border {{ $errors->has('sale_price') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                             >
-                            @error('sale_price')
-                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
                         </div>
                     </div>
 
@@ -331,11 +301,8 @@
                                     name="ncm"
                                     maxlength="8"
                                     :value="editing && editing.ncm !== undefined ? editing.ncm : '{{ old('ncm') }}'"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('ncm') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
-                                @error('ncm')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>
@@ -345,11 +312,8 @@
                                     name="cest"
                                     maxlength="7"
                                     :value="editing && editing.cest !== undefined ? editing.cest : '{{ old('cest') }}'"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('cest') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
-                                @error('cest')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>
@@ -360,11 +324,8 @@
                                     maxlength="6"
                                     placeholder="UN"
                                     :value="editing && editing.unidade_comercial !== undefined ? editing.unidade_comercial : '{{ old('unidade_comercial', 'UN') }}'"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('unidade_comercial') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
-                                @error('unidade_comercial')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
 
@@ -377,11 +338,8 @@
                                     maxlength="4"
                                     placeholder="5102"
                                     :value="editing && editing.cfop !== undefined ? editing.cfop : '{{ old('cfop') }}'"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('cfop') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
-                                @error('cfop')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>
@@ -392,11 +350,8 @@
                                     maxlength="3"
                                     placeholder="102"
                                     :value="editing && editing.csosn !== undefined ? editing.csosn : '{{ old('csosn') }}'"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('csosn') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
-                                @error('csosn')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>
@@ -404,15 +359,12 @@
                                 <select
                                     name="origem"
                                     :value="editing && editing.origem !== undefined ? editing.origem : undefined"
-                                    class="w-full rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    class="w-full rounded-md border {{ $errors->has('origem') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                 >
                                     @foreach (range(0, 8) as $code)
                                         <option value="{{ $code }}" @selected((int) old('origem', 0) === $code)>{{ $code }}</option>
                                     @endforeach
                                 </select>
-                                @error('origem')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                @enderror
                             </div>
                         </div>
                     </div>
@@ -449,7 +401,7 @@
                 class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
                 style="display: none;"
             >
-                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="downloadModalOpen = false">
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Download</h2>
 
                     <div class="space-y-3">
@@ -484,7 +436,7 @@
                 class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
                 style="display: none;"
             >
-                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="importModalOpen = false">
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Importar XLSX</h2>
 
                     <form method="POST" action="{{ route('products.import') }}" enctype="multipart/form-data" class="space-y-4">
@@ -518,7 +470,7 @@
                 class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
                 style="display: none;"
             >
-                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6" @click.outside="deleteErrorModalOpen = false">
+                <div class="w-full max-w-sm bg-brand-paper rounded-lg shadow p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Não foi possível excluir</h2>
 
                     @error('product')

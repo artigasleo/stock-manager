@@ -86,10 +86,10 @@
         <div
             x-show="modalOpen"
             x-cloak
-            class="fixed inset-0 bg-black/40 flex items-center justify-center p-4"
+            class="fixed inset-0 bg-black/40 flex items-start justify-center p-4 overflow-y-auto"
             style="display: none;"
         >
-            <div class="w-full max-w-md bg-brand-paper rounded-lg shadow p-6" @click.outside="modalOpen = false">
+            <div class="w-full max-w-md bg-brand-paper rounded-lg shadow p-6 my-8">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4" x-text="editing ? 'Editar usuário' : 'Novo usuário'"></h2>
 
                 <form

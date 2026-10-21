@@ -10,8 +10,8 @@
 <body class="bg-brand-cream text-stone-800 antialiased">
     <div class="min-h-screen flex flex-col">
         <header class="bg-brand text-brand-cream shadow">
-            <div class="flex items-center justify-between px-6 py-1">
-                <img src="{{ asset('images/logo.png') }}" alt="Go &amp; Do Emporium" class="h-16 w-auto">
+            <div class="flex items-center justify-between px-4 sm:px-6 py-1">
+                <img src="{{ asset('images/logo.png') }}" alt="Go &amp; Do Emporium" class="h-10 sm:h-16 w-auto">
 
                 @auth
                     <div class="flex items-center gap-4">
@@ -83,6 +83,34 @@
                             type="button"
                             @click="show = false"
                             class="text-green-800/60 hover:text-green-800 cursor-pointer leading-none"
+                        >
+                            &times;
+                        </button>
+                    </div>
+                @endif
+
+                @if ($errors->any() && ! $errors->hasAny(['product', 'xlsx_file', 'xml_file']))
+                    <div
+                        x-data="{ show: true }"
+                        x-init="setTimeout(() => show = false, 8000)"
+                        x-show="show"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 -translate-y-2"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100"
+                        x-transition:leave-end="opacity-0"
+                        class="fixed top-4 right-4 z-50 max-w-sm rounded-md border border-red-200 bg-red-50 text-red-800 px-4 py-3 text-sm shadow-lg flex items-start gap-3"
+                    >
+                        <div class="flex-1 space-y-1">
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
+                        <button
+                            type="button"
+                            @click="show = false"
+                            class="text-red-800/60 hover:text-red-800 cursor-pointer leading-none"
                         >
                             &times;
                         </button>
