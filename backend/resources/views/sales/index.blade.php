@@ -170,7 +170,7 @@
             @endcan
         </div>
 
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-stone-100 text-left text-stone-600">
                     <tr>

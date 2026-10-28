@@ -66,7 +66,7 @@
                 </ul>
             </nav>
 
-            <main class="flex-1 p-6">
+            <main class="flex-1 min-w-0 p-6">
                 @if (session('success'))
                     <div
                         x-data="{ show: true }"
