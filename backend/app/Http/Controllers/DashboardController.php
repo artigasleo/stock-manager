@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ProductStock;
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\SalePayment;
 use App\Models\StockMovement;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -46,9 +47,10 @@ class DashboardController extends Controller implements HasMiddleware
 
         $salesForPeriod = $period === 'day' ? $salesToday : $salesMonth;
 
-        $paymentMethodBreakdown = (clone $salesForPeriod)
-            ->selectRaw('payment_method, count(*) as count, sum(total) as total')
-            ->groupBy('payment_method')
+        $paymentMethodBreakdown = SalePayment::query()
+            ->joinSub((clone $salesForPeriod)->select('id'), 'period_sales', 'period_sales.id', '=', 'sale_payments.sale_id')
+            ->selectRaw('sale_payments.payment_method, count(*) as count, sum(sale_payments.amount) as total')
+            ->groupBy('sale_payments.payment_method')
             ->orderByDesc('total')
             ->get();
 

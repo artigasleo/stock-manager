@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CashClosingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
@@ -31,8 +33,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/detail', [ReportController::class, 'detail'])->name('reports.detail');
     Route::get('/reports/sales', [ReportController::class, 'salesIndex'])->name('reports.sales.index');
     Route::get('/reports/sales/export', [ReportController::class, 'salesExport'])->name('reports.sales.export');
+    Route::get('/reports/sales/export-by-product', [ReportController::class, 'salesExportByProduct'])->name('reports.sales.exportByProduct');
 
     Route::resource('units', UnitController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
     Route::resource('categories', CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('suppliers', SupplierController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('customers', CustomerController::class)->only(['index', 'store', 'update', 'destroy']);
@@ -53,8 +58,13 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('sales', SaleController::class)->only(['index', 'store']);
     Route::patch('/sales/{sale}/status', [SaleController::class, 'updateStatus'])->name('sales.updateStatus');
+    Route::patch('/sales/{sale}/customer', [SaleController::class, 'updateCustomer'])->name('sales.updateCustomer');
     Route::post('/sales/{sale}/nfce', [SaleController::class, 'emitNfce'])->name('sales.nfce.emit');
     Route::get('/nfce/export', [NfceController::class, 'export'])->name('nfce.export');
+
+    Route::get('/caixa', [CashClosingController::class, 'index'])->name('cashClosings.index');
+    Route::post('/caixa/abertura', [CashClosingController::class, 'openCash'])->name('cashClosings.openCash');
+    Route::post('/caixa', [CashClosingController::class, 'store'])->name('cashClosings.store');
 
     Route::resource('users', UserController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::resource('roles', RoleController::class)->only(['index', 'store', 'update', 'destroy']);

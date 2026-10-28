@@ -17,4 +17,5 @@ return [
     'sales' => ['label' => 'Vendas', 'actions' => ['view', 'edit']],
     'units' => ['label' => 'Unidades', 'actions' => ['view', 'edit']],
     'users' => ['label' => 'Usuários', 'actions' => ['view', 'edit']],
+    'settings' => ['label' => 'Configurações', 'actions' => ['view', 'edit']],
 ];

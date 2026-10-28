@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Actions\Nfce\EmitNfce;
 use App\Actions\Sale\CreateSale;
 use App\Actions\Sale\ListSale;
+use App\Actions\Sale\UpdateSaleCustomer;
 use App\Actions\Sale\UpdateSaleStatus;
 use App\Http\Requests\Sale\StoreSaleRequest;
+use App\Http\Requests\Sale\UpdateSaleCustomerRequest;
 use App\Http\Requests\Sale\UpdateSaleStatusRequest;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Seller;
+use App\Models\Setting;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -24,7 +27,7 @@ class SaleController extends Controller implements HasMiddleware
     {
         return [
             new Middleware('permission:sales.view', only: ['index']),
-            new Middleware('permission:sales.edit', only: ['store', 'updateStatus', 'emitNfce']),
+            new Middleware('permission:sales.edit', only: ['store', 'updateStatus', 'updateCustomer', 'emitNfce']),
         ];
     }
 
@@ -37,6 +40,7 @@ class SaleController extends Controller implements HasMiddleware
             'products' => Product::with('stocks')->orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
             'defaultUnit' => Unit::default(),
+            'usdExchangeRate' => Setting::get('usd_exchange_rate'),
         ]);
     }
 
@@ -61,9 +65,19 @@ class SaleController extends Controller implements HasMiddleware
         return redirect()->route('sales.index')->with('success', 'Status da venda atualizado.');
     }
 
+    public function updateCustomer(
+        UpdateSaleCustomerRequest $request,
+        Sale $sale,
+        UpdateSaleCustomer $action
+    ): RedirectResponse {
+        $action->execute($request, $sale);
+
+        return redirect()->route('sales.index')->with('success', 'Cliente da venda atualizado.');
+    }
+
     public function emitNfce(Sale $sale, EmitNfce $action): RedirectResponse
     {
-        $sale->load('items.product', 'customer', 'unit');
+        $sale->load('items.product', 'customer', 'unit', 'payments');
 
         $nfce = $action->execute($sale);
 

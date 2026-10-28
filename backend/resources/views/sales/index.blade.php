@@ -19,13 +19,7 @@
     // (ver UpdateSaleStatus), por isso fica fora das opções escolhíveis aqui.
     $selectableStatusLabels = collect($statusLabels)->except('invoiced');
 
-    $paymentLabels = [
-        'cash' => 'Dinheiro',
-        'pix' => 'PIX',
-        'debit_card' => 'Cartão de Débito',
-        'credit_card' => 'Cartão de Crédito',
-        'other' => 'Outro',
-    ];
+    $paymentLabels = config('payments.methods');
 
     // Aceita tanto o código de barras quanto o código interno do produto -
     // muitos produtos ainda não têm código de barras cadastrado.
@@ -55,8 +49,24 @@
             modalOpen: {{ $errors->any() ? 'true' : 'false' }},
             nfceExportModalOpen: false,
             unitId: {{ old('unit_id', $defaultUnit->id) }},
-            items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '' }]" }},
+            items: {{ old('items') ? json_encode(old('items')) : "[{ product_id: '', quantity: 1, unit_price: '', discount_percent: 0 }]" }},
             barcodeError: '',
+            discountMode: 'none',
+            saleDiscountPercent: '',
+            payments: {{ old('payments') ? json_encode(old('payments')) : "[{ payment_method: '', amount: '' }]" }},
+            usdExchangeRate: @js($usdExchangeRate),
+            usdTotal(amount) {
+                if (!this.usdExchangeRate) return '0';
+                return Math.ceil(Number(amount || 0) / Number(this.usdExchangeRate));
+            },
+            paymentsSum() {
+                return this.payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+            },
+            removePayment(index) {
+                if (this.payments.length > 1) {
+                    this.payments.splice(index, 1);
+                }
+            },
             productsByIdentifier: @js($productIdentifiers),
             productPrices: @js($products->pluck('sale_price', 'id')),
             stocksByUnit: @js($stocksByUnit),
@@ -64,23 +74,43 @@
                 return this.stocksByUnit[this.unitId]?.[productId] ?? 0;
             },
             fillPrice(item) {
-                if (!item.unit_price && item.product_id) {
+                if (item.product_id) {
                     item.unit_price = this.productPrices[item.product_id] ?? '';
                 }
             },
+            // O percentual efetivamente aplicado depende do modo: nenhum, um só
+            // pra venda inteira, ou um por item (ver inputs no template).
+            effectiveDiscount(item) {
+                if (this.discountMode === 'sale') return Number(this.saleDiscountPercent || 0);
+                if (this.discountMode === 'item') return Number(item.discount_percent || 0);
+                return 0;
+            },
             itemSubtotal(item) {
-                return (Number(item.quantity || 0) * Number(item.unit_price || 0)).toFixed(2);
+                const gross = Number(item.quantity || 0) * Number(item.unit_price || 0);
+                return (gross * (1 - this.effectiveDiscount(item) / 100)).toFixed(2);
             },
             cartTotal() {
                 return this.items
+                    .reduce((sum, item) => sum + Number(this.itemSubtotal(item)), 0)
+                    .toFixed(2);
+            },
+            cartGrossTotal() {
+                return this.items
                     .reduce((sum, item) => sum + (Number(item.quantity || 0) * Number(item.unit_price || 0)), 0)
                     .toFixed(2);
+            },
+            // Garante que o que será enviado bate com o modo escolhido, mesmo que o
+            // usuário tenha trocado de modo ou adicionado itens depois de digitar.
+            syncDiscounts() {
+                this.items.forEach((item) => {
+                    item.discount_percent = this.effectiveDiscount(item);
+                });
             },
             removeItem(index) {
                 if (this.items.length > 1) {
                     this.items.splice(index, 1);
                 } else {
-                    this.items[0] = { product_id: '', quantity: 1, unit_price: '' };
+                    this.items[0] = { product_id: '', quantity: 1, unit_price: '', discount_percent: 0 };
                 }
             },
             addByBarcode(rawCode) {
@@ -111,6 +141,7 @@
                     product_id: productId,
                     quantity: 1,
                     unit_price: this.productPrices[productId] ?? '',
+                    discount_percent: 0,
                 });
             },
         }"
@@ -157,9 +188,33 @@
                     @forelse ($sales as $sale)
                         <tr>
                             <td class="px-4 py-3">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
-                            <td class="px-4 py-3">{{ $sale->customer?->name ?? 'Não identificado' }}</td>
+                            <td class="px-4 py-3">
+                                @can('sales.edit')
+                                    <form method="POST" action="{{ route('sales.updateCustomer', $sale) }}">
+                                        @csrf
+                                        @method('PATCH')
+                                        <select
+                                            name="customer_id"
+                                            onchange="this.form.submit()"
+                                            @if ($sale->nfce?->status === 'authorized')
+                                                title="A NFC-e já emitida não é alterada — isso só atualiza o registro interno da venda."
+                                            @endif
+                                            class="rounded-md border border-stone-300 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brand"
+                                        >
+                                            <option value="" @selected(!$sale->customer_id)>Não identificado</option>
+                                            @foreach ($customers as $customer)
+                                                <option value="{{ $customer->id }}" @selected($sale->customer_id === $customer->id)>
+                                                    {{ $customer->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </form>
+                                @else
+                                    {{ $sale->customer?->name ?? 'Não identificado' }}
+                                @endcan
+                            </td>
                             <td class="px-4 py-3">{{ $sale->items->pluck('product.name')->join(', ') }}</td>
-                            <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? '—' }}</td>
+                            <td class="px-4 py-3">{{ $sale->payments->map(fn ($p) => $paymentLabels[$p->payment_method] ?? $p->payment_method)->implode(' + ') ?: '—' }}</td>
                             <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
                             <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                             <td class="px-4 py-3">
@@ -245,13 +300,13 @@
             class="fixed inset-0 bg-black/40 flex items-start justify-center p-4 overflow-y-auto"
             style="display: none;"
         >
-            <div class="w-full max-w-2xl bg-brand-paper rounded-lg shadow p-6 my-8">
+            <div class="w-full max-w-4xl bg-brand-paper rounded-lg shadow p-6 my-8">
                 <h2 class="text-lg font-semibold text-brand-dark mb-4">Nova venda</h2>
 
-                <form method="POST" action="{{ route('sales.store') }}" class="space-y-4">
+                <form method="POST" action="{{ route('sales.store') }}" class="space-y-4" @submit="syncDiscounts()">
                     @csrf
 
-                    <div class="grid grid-cols-4 gap-4">
+                    <div class="grid grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium mb-1">Unidade</label>
                             <select
@@ -296,19 +351,6 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        <div>
-                            <label class="block text-sm font-medium mb-1">Forma de pagamento</label>
-                            <select
-                                name="payment_method"
-                                class="w-full rounded-md border {{ $errors->has('payment_method') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-                            >
-                                <option value="" @selected(!old('payment_method'))>Selecione...</option>
-                                @foreach ($paymentLabels as $value => $label)
-                                    <option value="{{ $value }}" @selected(old('payment_method') === $value)>{{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
 
                     <div>
@@ -327,11 +369,38 @@
                             <label class="block text-sm font-medium">Itens</label>
                             <button
                                 type="button"
-                                @click="items.push({ product_id: '', quantity: 1, unit_price: '' })"
+                                @click="items.push({ product_id: '', quantity: 1, unit_price: '', discount_percent: 0 })"
                                 class="text-sm text-brand hover:underline cursor-pointer"
                             >
                                 + Adicionar item
                             </button>
+                        </div>
+
+                        <div class="flex items-center gap-4 mb-3 text-sm">
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="radio" name="discount_mode_ui" value="none" x-model="discountMode" class="cursor-pointer">
+                                Sem desconto
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="radio" name="discount_mode_ui" value="sale" x-model="discountMode" class="cursor-pointer">
+                                Desconto na venda inteira
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer">
+                                <input type="radio" name="discount_mode_ui" value="item" x-model="discountMode" class="cursor-pointer">
+                                Desconto por produto
+                            </label>
+
+                            <div x-show="discountMode === 'sale'" x-cloak class="flex items-center gap-1.5 ml-auto">
+                                <label class="text-stone-600">Desconto (%)</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    step="0.01"
+                                    x-model="saleDiscountPercent"
+                                    class="w-20 rounded-md border border-stone-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                >
+                            </div>
                         </div>
 
                         <div class="space-y-2">
@@ -341,7 +410,7 @@
                                         :name="`items[${index}][product_id]`"
                                         x-model="item.product_id"
                                         @change="fillPrice(item)"
-                                        class="col-span-4 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        class="col-span-3 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
                                         <option value="">Selecione...</option>
                                         @foreach ($products as $product)
@@ -366,13 +435,24 @@
                                     </div>
 
                                     <input
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
+                                        type="text"
+                                        readonly
+                                        tabindex="-1"
                                         placeholder="Preço unit."
-                                        :name="`items[${index}][unit_price]`"
                                         x-model="item.unit_price"
-                                        class="col-span-2 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        title="O preço vem do cadastro do produto e não pode ser alterado na venda."
+                                        class="col-span-2 rounded-md border border-stone-300 bg-stone-100 px-2 py-1.5 text-sm text-stone-600 cursor-not-allowed"
+                                    >
+
+                                    <input
+                                        :type="discountMode === 'item' ? 'number' : 'hidden'"
+                                        min="0"
+                                        max="100"
+                                        step="0.01"
+                                        placeholder="%"
+                                        :name="`items[${index}][discount_percent]`"
+                                        x-model="item.discount_percent"
+                                        class="col-span-1 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
                                     >
 
                                     <span class="col-span-3 py-1.5 text-sm text-right pr-2 text-stone-700" x-text="'R$ ' + itemSubtotal(item)"></span>
@@ -388,11 +468,88 @@
                             </template>
                         </div>
 
-                        <div class="flex justify-end mt-2 pt-2 border-t border-stone-200">
-                            <span class="text-sm font-semibold text-brand-dark">
-                                Total: R$ <span x-text="cartTotal()"></span>
-                            </span>
+                        <div class="mt-2 pt-2 border-t border-stone-200">
+                            <div class="flex justify-end items-baseline gap-2">
+                                <span x-show="discountMode !== 'none'" x-cloak class="text-sm text-stone-400 line-through">
+                                    R$ <span x-text="cartGrossTotal()"></span>
+                                </span>
+                                <span class="text-sm font-semibold text-brand-dark">
+                                    Total: R$ <span x-text="cartTotal()"></span>
+                                </span>
+                            </div>
                         </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-sm font-medium">Forma de pagamento</label>
+                            <button
+                                type="button"
+                                @click="payments.push({ payment_method: '', amount: '' })"
+                                class="text-sm text-brand hover:underline cursor-pointer"
+                            >
+                                + Adicionar forma de pagamento
+                            </button>
+                        </div>
+
+                        <div class="space-y-2" x-effect="payments.length === 1 && (payments[0].amount = cartTotal())">
+                            <template x-for="(payment, index) in payments" :key="index">
+                                <div class="grid grid-cols-12 gap-2 items-start">
+                                    <select
+                                        :name="`payments[${index}][payment_method]`"
+                                        x-model="payment.payment_method"
+                                        class="col-span-6 rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        @foreach ($paymentLabels as $value => $label)
+                                            <option value="{{ $value }}">{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+
+                                    <div class="col-span-4">
+                                        <input
+                                            type="number"
+                                            min="0.01"
+                                            step="0.01"
+                                            placeholder="Valor (R$)"
+                                            :name="`payments[${index}][amount]`"
+                                            x-model="payment.amount"
+                                            :readonly="payments.length === 1"
+                                            :class="payments.length === 1 ? 'bg-stone-100 text-stone-600 cursor-not-allowed' : ''"
+                                            class="w-full rounded-md border border-stone-300 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                                        >
+                                        <p
+                                            x-show="payment.payment_method === 'cash_usd'"
+                                            x-cloak
+                                            class="mt-0.5 text-xs text-stone-500"
+                                        >
+                                            <template x-if="usdExchangeRate">
+                                                <span>Cobrar: <strong x-text="'US$ ' + usdTotal(payment.amount)"></strong> (cotação R$ <span x-text="usdExchangeRate"></span>)</span>
+                                            </template>
+                                            <template x-if="!usdExchangeRate">
+                                                <span class="text-red-600">Cotação do dólar não configurada.</span>
+                                            </template>
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        x-show="payments.length > 1"
+                                        @click="removePayment(index)"
+                                        class="col-span-2 py-1.5 text-red-600 hover:underline cursor-pointer text-sm"
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+
+                        <p
+                            class="mt-2 text-right text-sm"
+                            :class="Math.abs(paymentsSum() - Number(cartTotal())) > 0.01 ? 'text-red-600 font-medium' : 'text-stone-500'"
+                        >
+                            Soma dos pagamentos: R$ <span x-text="paymentsSum().toFixed(2)"></span>
+                        </p>
                     </div>
 
                     <div class="flex justify-end gap-2 pt-2">

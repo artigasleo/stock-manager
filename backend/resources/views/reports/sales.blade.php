@@ -45,7 +45,15 @@
             formaction="{{ route('reports.sales.export') }}"
             class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
         >
-            Exportar CSV
+            Exportar CSV (por venda)
+        </button>
+
+        <button
+            type="submit"
+            formaction="{{ route('reports.sales.exportByProduct') }}"
+            class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
+        >
+            Exportar CSV (por produto)
         </button>
     </form>
 
@@ -69,7 +77,7 @@
                         <td class="px-4 py-3">
                             {{ $sale->items->map(fn ($item) => ($item->product?->name ?? 'Produto removido').' (x'.$item->quantity.')')->implode(', ') }}
                         </td>
-                        <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? 'Não informado' }}</td>
+                        <td class="px-4 py-3">{{ $sale->payments->map(fn ($p) => $paymentLabels[$p->payment_method] ?? $p->payment_method)->implode(' + ') ?: 'Não informado' }}</td>
                         <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                         <td class="px-4 py-3">{{ $sale->customer?->name ?? 'Não identificado' }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$sale->status] ?? $sale->status }}</td>

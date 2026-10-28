@@ -17,14 +17,6 @@ class ReportController extends Controller implements HasMiddleware
 {
     private const GRANULARITIES = ['day', 'month', 'quarter', 'semester', 'year'];
 
-    private const PAYMENT_LABELS = [
-        'cash' => 'Dinheiro',
-        'pix' => 'PIX',
-        'debit_card' => 'Cartão de Débito',
-        'credit_card' => 'Cartão de Crédito',
-        'other' => 'Outro',
-    ];
-
     private const STATUS_LABELS = [
         'awaiting_payment' => 'Aguardando Pagamento',
         'paid' => 'Paga',
@@ -81,7 +73,7 @@ class ReportController extends Controller implements HasMiddleware
         return view('reports.detail', [
             'sales' => Sale::where('status', '!=', 'cancelled')
                 ->whereBetween('created_at', [$from, $to])
-                ->with(['customer', 'seller', 'user'])
+                ->with(['customer', 'seller', 'user', 'payments'])
                 ->orderBy('created_at')
                 ->get(),
             'label' => $request->string('label')->value(),
@@ -97,7 +89,7 @@ class ReportController extends Controller implements HasMiddleware
             'sales' => $this->salesBetween($from, $to),
             'from' => $from->format('Y-m-d'),
             'to' => $to->format('Y-m-d'),
-            'paymentLabels' => self::PAYMENT_LABELS,
+            'paymentLabels' => config('payments.methods'),
             'statusLabels' => self::STATUS_LABELS,
         ]);
     }
@@ -118,12 +110,41 @@ class ReportController extends Controller implements HasMiddleware
                 fputcsv($handle, [
                     $sale->created_at->format('d/m/Y H:i'),
                     $sale->items->map(fn ($item) => ($item->product?->name ?? 'Produto removido').' (x'.$item->quantity.')')->implode(', '),
-                    self::PAYMENT_LABELS[$sale->payment_method] ?? 'Não informado',
+                    $sale->payments->map(fn ($p) => config('payments.methods')[$p->payment_method] ?? $p->payment_method)->implode(' + ') ?: 'Não informado',
                     $sale->seller?->name ?? '—',
                     $sale->customer?->name ?? 'Não identificado',
                     self::STATUS_LABELS[$sale->status] ?? $sale->status,
                     number_format($sale->total, 2, ',', '.'),
                 ], ';');
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function salesExportByProduct(Request $request): StreamedResponse
+    {
+        [$from, $to] = $this->dateRange($request);
+        $sales = $this->salesBetween($from, $to);
+
+        $filename = 'vendas-por-produto-'.$from->format('Y-m-d').'-a-'.$to->format('Y-m-d').'.csv';
+
+        return response()->streamDownload(function () use ($sales) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Produto', 'Fornecedor', 'Custo (R$)', 'Preço (R$)', 'Quantidade', 'Data/Hora da venda'], ';');
+
+            foreach ($sales as $sale) {
+                foreach ($sale->items as $item) {
+                    fputcsv($handle, [
+                        $item->product?->name ?? 'Produto removido',
+                        $item->product?->supplier?->name ?? '—',
+                        number_format($item->product?->cost_price ?? 0, 2, ',', '.'),
+                        number_format($item->unit_price, 2, ',', '.'),
+                        $item->quantity,
+                        $sale->created_at->format('d/m/Y H:i'),
+                    ], ';');
+                }
             }
 
             fclose($handle);
@@ -145,7 +166,7 @@ class ReportController extends Controller implements HasMiddleware
     private function salesBetween(Carbon $from, Carbon $to): Collection
     {
         return Sale::whereBetween('created_at', [$from, $to])
-            ->with(['customer', 'seller', 'user', 'items.product'])
+            ->with(['customer', 'seller', 'user', 'items.product.supplier', 'payments'])
             ->orderBy('created_at')
             ->get();
     }

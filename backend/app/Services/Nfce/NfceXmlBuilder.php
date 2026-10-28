@@ -7,14 +7,6 @@ use NFePHP\NFe\Make;
 
 class NfceXmlBuilder
 {
-    private const PAYMENT_CODES = [
-        'cash' => '01',
-        'pix' => '17',
-        'debit_card' => '04',
-        'credit_card' => '03',
-        'other' => '99',
-    ];
-
     public function build(Sale $sale, int $serie, int $numero): string
     {
         $emitente = config('nfce.emitente');
@@ -84,11 +76,19 @@ class NfceXmlBuilder
         $pag->vTroco = 0;
         $nfe->tagpag($pag);
 
-        $detPag = new \stdClass;
-        $detPag->tPag = self::PAYMENT_CODES[$sale->payment_method] ?? '99';
-        $detPag->vPag = (float) $sale->total;
-        $detPag->tpIntegra = 2; // pagamento não integrado (sem TEF/POS conectado ao sistema)
-        $nfe->tagdetPag($detPag);
+        foreach ($sale->payments as $payment) {
+            $detPag = new \stdClass;
+            $detPag->tPag = config('payments.nfce_codes')[$payment->payment_method] ?? '99';
+            $detPag->vPag = (float) $payment->amount;
+
+            // SEFAZ rejeita (cStat 963) o grupo "card"/tpIntegra pra dinheiro, mas
+            // exige (cStat 391, NT 2024.003 v1.11) pra qualquer pagamento eletrônico.
+            if (! in_array($payment->payment_method, ['cash', 'cash_usd'], true)) {
+                $detPag->tpIntegra = 2; // pagamento não integrado (sem TEF/POS conectado ao sistema)
+            }
+
+            $nfe->tagdetPag($detPag);
+        }
 
         return $nfe->getXML();
     }
@@ -118,6 +118,8 @@ class NfceXmlBuilder
         $product = $item->product;
         $quantity = (float) $item->quantity;
         $unitPrice = (float) $item->unit_price;
+        $grossTotal = round($quantity * $unitPrice, 2);
+        $discount = round($grossTotal * ((float) $item->discount_percent / 100), 2);
 
         $prod = new \stdClass;
         $prod->item = $itemNumber;
@@ -129,11 +131,17 @@ class NfceXmlBuilder
         $prod->uCom = $product->unidade_comercial ?: $defaults['unidade_comercial'];
         $prod->qCom = $quantity;
         $prod->vUnCom = $unitPrice;
-        $prod->vProd = round($quantity * $unitPrice, 2);
+        $prod->vProd = $grossTotal;
         $prod->cEANTrib = $prod->cEAN;
         $prod->uTrib = $prod->uCom;
         $prod->qTrib = $quantity;
         $prod->vUnTrib = $unitPrice;
+
+        // vDesc não aceita "0.00" no schema da NFC-e — só entra quando há desconto de fato.
+        if ($discount > 0) {
+            $prod->vDesc = $discount;
+        }
+
         $prod->indTot = 1;
         $nfe->tagprod($prod);
 

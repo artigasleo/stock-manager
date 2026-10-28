@@ -3,14 +3,7 @@
 @section('content')
     @php
         $lowStockCount = $lowStockStocks->count();
-
-        $paymentLabels = [
-            'cash' => 'Dinheiro',
-            'pix' => 'PIX',
-            'debit_card' => 'Cartão de Débito',
-            'credit_card' => 'Cartão de Crédito',
-            'other' => 'Outro',
-        ];
+        $paymentLabels = config('payments.methods');
     @endphp
 
     <h1 class="text-2xl font-semibold text-brand-dark mb-4">Dashboard</h1>

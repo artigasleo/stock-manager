@@ -10,7 +10,7 @@ class ListSale
     public function execute(): Collection
     {
         return Sale::query()
-            ->with(['customer', 'seller', 'user', 'items.product', 'nfce'])
+            ->with(['customer', 'seller', 'user', 'items.product', 'nfce', 'payments'])
             ->latest()
             ->get();
     }

@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['sale_id', 'product_id', 'quantity', 'unit_price'])]
+#[Fillable(['sale_id', 'product_id', 'quantity', 'unit_price', 'discount_percent'])]
 class SaleItem extends Model
 {
     protected function casts(): array
     {
         return [
             'unit_price' => 'decimal:2',
+            'discount_percent' => 'decimal:2',
         ];
     }
 

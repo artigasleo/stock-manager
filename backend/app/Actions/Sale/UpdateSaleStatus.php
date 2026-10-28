@@ -44,7 +44,7 @@ class UpdateSaleStatus
             $sale->update(['status' => $newStatus]);
 
             if ($newStatus === 'paid') {
-                $nfce = $this->emitNfce->execute($sale->load('items.product', 'customer', 'unit'));
+                $nfce = $this->emitNfce->execute($sale->load('items.product', 'customer', 'unit', 'payments'));
 
                 if ($nfce->status === 'authorized') {
                     $sale->update(['status' => 'invoiced']);

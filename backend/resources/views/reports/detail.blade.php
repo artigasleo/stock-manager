@@ -1,13 +1,7 @@
 @extends('layouts.app')
 
 @php
-    $paymentLabels = [
-        'cash' => 'Dinheiro',
-        'pix' => 'PIX',
-        'debit_card' => 'Cartão de Débito',
-        'credit_card' => 'Cartão de Crédito',
-        'other' => 'Outro',
-    ];
+    $paymentLabels = config('payments.methods');
 
     $totalSum = $sales->sum('total');
 @endphp
@@ -42,7 +36,7 @@
                     <tr>
                         <td class="px-4 py-3">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                         <td class="px-4 py-3">{{ $sale->customer?->name ?? 'Não identificado' }}</td>
-                        <td class="px-4 py-3">{{ $paymentLabels[$sale->payment_method] ?? 'Não informado' }}</td>
+                        <td class="px-4 py-3">{{ $sale->payments->map(fn ($p) => $paymentLabels[$p->payment_method] ?? $p->payment_method)->implode(' + ') ?: 'Não informado' }}</td>
                         <td class="px-4 py-3">{{ $sale->seller?->name ?? '—' }}</td>
                         <td class="px-4 py-3">R$ {{ number_format($sale->total, 2, ',', '.') }}</td>
                     </tr>

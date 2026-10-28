@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['unit_id', 'customer_id', 'seller_id', 'user_id', 'status', 'payment_method', 'total'])]
+#[Fillable(['unit_id', 'customer_id', 'seller_id', 'user_id', 'status', 'total'])]
 class Sale extends Model
 {
     protected function casts(): array
@@ -46,5 +46,10 @@ class Sale extends Model
     public function nfce(): HasOne
     {
         return $this->hasOne(Nfce::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(SalePayment::class);
     }
 }

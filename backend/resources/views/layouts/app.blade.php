@@ -42,9 +42,11 @@
                         ['label' => 'Movimentações', 'route' => 'stock.index', 'permission' => 'stock.view'],
                         ['label' => 'Compras', 'route' => 'purchases.index', 'permission' => 'purchases.view'],
                         ['label' => 'Vendas', 'route' => 'sales.index', 'permission' => 'sales.view'],
+                        ['label' => 'Fechamento de Caixa', 'route' => 'cashClosings.index', 'permission' => 'sales.edit'],
                         ['label' => 'Unidades', 'route' => 'units.index', 'permission' => 'units.view'],
                         ['label' => 'Usuários', 'route' => 'users.index', 'permission' => 'users.view'],
                         ['label' => 'Funções', 'route' => 'roles.index', 'permission' => 'users.view'],
+                        ['label' => 'Configurações', 'route' => 'settings.index', 'permission' => 'settings.view'],
                     ];
                 @endphp
 
