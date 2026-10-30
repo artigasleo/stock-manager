@@ -57,7 +57,7 @@
             usdExchangeRate: @js($usdExchangeRate),
             usdTotal(amount) {
                 if (!this.usdExchangeRate) return '0';
-                return Math.ceil(Number(amount || 0) / Number(this.usdExchangeRate));
+                return Math.round(Number(amount || 0) / Number(this.usdExchangeRate));
             },
             paymentsSum() {
                 return this.payments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
