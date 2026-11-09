@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'unit_id', 'date',
     'opened_by_user_id', 'opened_at', 'opening_cash', 'opening_cash_usd',
     'closed_by_user_id', 'closed_at',
-    'notes',
+    'notes', 'moms_registered',
 ])]
 class CashClosing extends Model
 {
@@ -23,6 +23,7 @@ class CashClosing extends Model
             'closed_at' => 'datetime',
             'opening_cash' => 'decimal:2',
             'opening_cash_usd' => 'decimal:2',
+            'moms_registered' => 'integer',
         ];
     }
 

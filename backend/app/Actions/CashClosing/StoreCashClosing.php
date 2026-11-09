@@ -39,6 +39,7 @@ class StoreCashClosing
                 'closed_by_user_id' => $user->id,
                 'closed_at' => now(),
                 'notes' => $request->validated('notes'),
+                'moms_registered' => $request->validated('moms_registered'),
             ])->save();
 
             $closing->items()->delete();

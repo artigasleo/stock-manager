@@ -184,6 +184,20 @@
             </table>
 
             <div>
+                <label class="block text-sm font-medium mb-1">Cadastros de mães feitos hoje (opcional)</label>
+                <input
+                    type="number"
+                    step="1"
+                    min="0"
+                    name="moms_registered"
+                    value="{{ old('moms_registered', $existing?->moms_registered) }}"
+                    placeholder="0"
+                    class="w-32 rounded-md border {{ $errors->has('moms_registered') ? 'border-red-500' : 'border-stone-300' }} px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                >
+                <p class="mt-1 text-xs text-stone-500">Não entra na soma do caixa — é só um contador separado.</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium mb-1">Observações (opcional)</label>
                 <textarea
                     name="notes"
@@ -212,6 +226,7 @@
                         <th class="px-4 py-3">Esperado (R$)</th>
                         <th class="px-4 py-3">Contado (R$)</th>
                         <th class="px-4 py-3">Diferença (R$)</th>
+                        <th class="px-4 py-3">Cadastros de mães</th>
                         <th class="px-4 py-3">Fechado por</th>
                         <th class="px-4 py-3"></th>
                     </tr>
@@ -230,6 +245,7 @@
                             <td class="px-4 py-3 font-medium {{ $closingDiff == 0 ? 'text-stone-600' : ($closingDiff > 0 ? 'text-green-600' : 'text-red-600') }}">
                                 R$ {{ number_format($closingDiff, 2, ',', '.') }}
                             </td>
+                            <td class="px-4 py-3">{{ $closing->moms_registered ?? '—' }}</td>
                             <td class="px-4 py-3">{{ $closing->closedBy->name }}</td>
                             <td class="px-4 py-3">
                                 <a
@@ -242,7 +258,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-stone-500">
+                            <td colspan="7" class="px-4 py-6 text-center text-stone-500">
                                 Nenhum fechamento registrado ainda.
                             </td>
                         </tr>
