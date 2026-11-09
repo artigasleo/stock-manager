@@ -56,7 +56,7 @@ class DashboardController extends Controller implements HasMiddleware
 
         $topSellingProducts = SaleItem::query()
             ->joinSub((clone $salesForPeriod)->select('id'), 'period_sales', 'period_sales.id', '=', 'sale_items.sale_id')
-            ->selectRaw('sale_items.product_id, sum(sale_items.quantity) as total_quantity, sum(sale_items.quantity * sale_items.unit_price) as total_revenue')
+            ->selectRaw('sale_items.product_id, sum(sale_items.quantity) as total_quantity, sum(sale_items.quantity * sale_items.unit_price * (1 - sale_items.discount_percent / 100)) as total_revenue')
             ->groupBy('sale_items.product_id')
             ->orderByDesc('total_quantity')
             ->with('product')
@@ -65,7 +65,7 @@ class DashboardController extends Controller implements HasMiddleware
 
         $topRevenueProducts = SaleItem::query()
             ->joinSub((clone $salesForPeriod)->select('id'), 'period_sales', 'period_sales.id', '=', 'sale_items.sale_id')
-            ->selectRaw('sale_items.product_id, sum(sale_items.quantity * sale_items.unit_price) as total_revenue')
+            ->selectRaw('sale_items.product_id, sum(sale_items.quantity * sale_items.unit_price * (1 - sale_items.discount_percent / 100)) as total_revenue')
             ->groupBy('sale_items.product_id')
             ->orderByDesc('total_revenue')
             ->with('product')

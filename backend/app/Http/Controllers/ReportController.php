@@ -132,15 +132,18 @@ class ReportController extends Controller implements HasMiddleware
         return response()->streamDownload(function () use ($sales) {
             $handle = fopen('php://output', 'w');
             fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['Produto', 'Fornecedor', 'Custo (R$)', 'Preço (R$)', 'Quantidade', 'Data/Hora da venda'], ';');
+            fputcsv($handle, ['Produto', 'Fornecedor', 'Custo (R$)', 'Preço (R$)', 'Desconto (%)', 'Quantidade', 'Data/Hora da venda'], ';');
 
             foreach ($sales as $sale) {
                 foreach ($sale->items as $item) {
+                    $soldUnitPrice = round((float) $item->unit_price * (1 - (float) $item->discount_percent / 100), 2);
+
                     fputcsv($handle, [
                         $item->product?->name ?? 'Produto removido',
                         $item->product?->supplier?->name ?? '—',
                         number_format($item->product?->cost_price ?? 0, 2, ',', '.'),
-                        number_format($item->unit_price, 2, ',', '.'),
+                        number_format($soldUnitPrice, 2, ',', '.'),
+                        number_format($item->discount_percent, 2, ',', '.'),
                         $item->quantity,
                         $sale->created_at->format('d/m/Y H:i'),
                     ], ';');
