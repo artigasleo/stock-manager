@@ -26,6 +26,13 @@
             </a>
 
             <a
+                href="{{ route('reports.products.index') }}"
+                class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
+            >
+                Relatório por produto &rarr;
+            </a>
+
+            <a
                 href="{{ route('reports.export', ['granularity' => $granularity]) }}"
                 class="rounded-md border border-brand text-brand px-4 py-2 text-sm font-medium hover:bg-brand hover:text-brand-cream cursor-pointer"
             >

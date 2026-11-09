@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Report\GenerateProductsReport;
 use App\Actions\Report\GenerateSalesReport;
 use App\Models\Sale;
 use Exception;
@@ -148,6 +149,42 @@ class ReportController extends Controller implements HasMiddleware
                         $sale->created_at->format('d/m/Y H:i'),
                     ], ';');
                 }
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function productsIndex(Request $request, GenerateProductsReport $action): View
+    {
+        [$from, $to] = $this->dateRange($request);
+
+        return view('reports.products', [
+            'rows' => $action->execute($from, $to),
+            'from' => $from->format('Y-m-d'),
+            'to' => $to->format('Y-m-d'),
+        ]);
+    }
+
+    public function productsExport(Request $request, GenerateProductsReport $action): StreamedResponse
+    {
+        [$from, $to] = $this->dateRange($request);
+        $rows = $action->execute($from, $to);
+
+        $filename = 'relatorio-por-produto-'.$from->format('Y-m-d').'-a-'.$to->format('Y-m-d').'.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, ['Produto', 'Fornecedor', 'Quantidade vendida', 'Faturamento (R$)'], ';');
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->product?->name ?? 'Produto removido',
+                    $row->product?->supplier?->name ?? '—',
+                    $row->total_quantity,
+                    number_format($row->total_revenue, 2, ',', '.'),
+                ], ';');
             }
 
             fclose($handle);

@@ -34,6 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/reports/sales', [ReportController::class, 'salesIndex'])->name('reports.sales.index');
     Route::get('/reports/sales/export', [ReportController::class, 'salesExport'])->name('reports.sales.export');
     Route::get('/reports/sales/export-by-product', [ReportController::class, 'salesExportByProduct'])->name('reports.sales.exportByProduct');
+    Route::get('/reports/products', [ReportController::class, 'productsIndex'])->name('reports.products.index');
+    Route::get('/reports/products/export', [ReportController::class, 'productsExport'])->name('reports.products.export');
 
     Route::resource('units', UnitController::class)->only(['index', 'store', 'update', 'destroy']);
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
