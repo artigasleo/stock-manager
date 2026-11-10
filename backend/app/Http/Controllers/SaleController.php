@@ -17,6 +17,7 @@ use App\Models\Seller;
 use App\Models\Setting;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
@@ -31,16 +32,22 @@ class SaleController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(ListSale $action): View
+    public function index(Request $request, ListSale $action): View
     {
+        $perPage = in_array($request->query('per_page'), ['5', '10', '25', '50', 'all'], true)
+            ? $request->query('per_page')
+            : '25';
+        $page = $request->integer('page', 1);
+
         return view('sales.index', [
-            'sales' => $action->execute(),
+            'sales' => $action->execute($perPage, $page),
             'customers' => Customer::orderBy('name')->get(),
             'sellers' => Seller::where('active', true)->orderBy('name')->get(),
             'products' => Product::with('stocks')->orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
             'defaultUnit' => Unit::default(),
             'usdExchangeRate' => Setting::get('usd_exchange_rate'),
+            'perPage' => $perPage,
         ]);
     }
 
