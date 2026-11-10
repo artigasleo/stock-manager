@@ -37,7 +37,7 @@
             @endcan
         </div>
 
-        <form method="GET" action="{{ route('stock.index') }}" class="mb-4">
+        <form method="GET" action="{{ route('stock.index') }}" class="flex items-center gap-3 mb-4">
             <select
                 name="product_id"
                 onchange="this.form.submit()"
@@ -87,6 +87,27 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex items-center justify-between mt-4">
+            <form method="GET" action="{{ route('stock.index') }}" class="flex items-center gap-2">
+                <input type="hidden" name="product_id" value="{{ $selectedProductId }}">
+
+                <label class="text-sm text-stone-600">Mostrar</label>
+                <select
+                    name="per_page"
+                    onchange="this.form.submit()"
+                    class="rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                >
+                    @foreach (['5' => '5 por página', '10' => '10 por página', '25' => '25 por página', '50' => '50 por página', 'all' => 'Ver tudo'] as $value => $label)
+                        <option value="{{ $value }}" @selected($perPage === (string) $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </form>
+
+            @if ($movements instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
+                {{ $movements->links() }}
+            @endif
         </div>
 
         <div

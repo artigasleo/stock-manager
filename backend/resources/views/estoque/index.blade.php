@@ -10,14 +10,6 @@
             downloadModalOpen: false,
             importModalOpen: {{ $errors->has('xlsx_file') ? 'true' : 'false' }},
             deleteErrorModalOpen: {{ $errors->has('product') ? 'true' : 'false' }},
-            search: '',
-            matches(name, code, barcode) {
-                if (!this.search) return true;
-                const q = this.search.toLowerCase();
-                return name.toLowerCase().includes(q)
-                    || (code && code.toLowerCase().includes(q))
-                    || (barcode && barcode.toLowerCase().includes(q));
-            },
         }"
     >
         <div class="flex items-center justify-between mb-4">
@@ -52,19 +44,24 @@
             @endcan
         </div>
 
-        <div class="mb-4">
+        <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-3 mb-4">
             <input
                 type="text"
-                x-model="search"
+                name="search"
+                value="{{ $search }}"
+                @input.debounce.500ms="$el.form.requestSubmit()"
                 placeholder="Buscar por nome, código ou código de barras..."
                 class="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
             >
-        </div>
+            <input type="hidden" name="per_page" value="{{ $perPage }}">
+        </form>
 
         @php
             $sortLink = fn (string $column) => route('products.index', [
                 'sort' => $column,
                 'direction' => $sort === $column && $direction === 'asc' ? 'desc' : 'asc',
+                'search' => $search,
+                'per_page' => $perPage,
             ]);
             $sortIcon = fn (string $column) => $sort === $column ? ($direction === 'asc' ? '▲' : '▼') : '';
             $sortableColumns = [
@@ -96,7 +93,7 @@
                 </thead>
                 <tbody class="divide-y divide-stone-200">
                     @forelse ($products as $product)
-                        <tr x-show="matches(@js($product->name), @js($product->code), @js($product->barcode))">
+                        <tr>
                             <td class="px-4 py-3">{{ $product->code }}</td>
                             <td class="px-4 py-3">{{ $product->barcode ?? '—' }}</td>
                             <td class="px-4 py-3">{{ $product->name }}</td>
@@ -143,6 +140,29 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex items-center justify-between mt-4">
+            <form method="GET" action="{{ route('products.index') }}" class="flex items-center gap-2">
+                <input type="hidden" name="search" value="{{ $search }}">
+                <input type="hidden" name="sort" value="{{ $sort }}">
+                <input type="hidden" name="direction" value="{{ $direction }}">
+
+                <label class="text-sm text-stone-600">Mostrar</label>
+                <select
+                    name="per_page"
+                    onchange="this.form.submit()"
+                    class="rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                >
+                    @foreach (['5' => '5 por página', '10' => '10 por página', '25' => '25 por página', '50' => '50 por página', 'all' => 'Ver tudo'] as $value => $label)
+                        <option value="{{ $value }}" @selected($perPage === (string) $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </form>
+
+            @if ($products instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
+                {{ $products->links() }}
+            @endif
         </div>
 
         <div

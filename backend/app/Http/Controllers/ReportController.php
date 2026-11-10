@@ -158,18 +158,26 @@ class ReportController extends Controller implements HasMiddleware
     public function productsIndex(Request $request, GenerateProductsReport $action): View
     {
         [$from, $to] = $this->dateRange($request);
+        $search = $request->string('search')->value() ?: null;
+        $perPage = in_array($request->query('per_page'), ['5', '10', '25', '50', 'all'], true)
+            ? $request->query('per_page')
+            : '25';
+        $page = $request->integer('page', 1);
 
         return view('reports.products', [
-            'rows' => $action->execute($from, $to),
+            'rows' => $action->execute($from, $to, $search, $perPage, $page),
             'from' => $from->format('Y-m-d'),
             'to' => $to->format('Y-m-d'),
+            'search' => $search,
+            'perPage' => $perPage,
         ]);
     }
 
     public function productsExport(Request $request, GenerateProductsReport $action): StreamedResponse
     {
         [$from, $to] = $this->dateRange($request);
-        $rows = $action->execute($from, $to);
+        $search = $request->string('search')->value() ?: null;
+        $rows = $action->execute($from, $to, $search, 'all');
 
         $filename = 'relatorio-por-produto-'.$from->format('Y-m-d').'-a-'.$to->format('Y-m-d').'.csv';
 

@@ -25,12 +25,17 @@ class StockMovementController extends Controller implements HasMiddleware
 
     public function index(Request $request, ListStockMovement $action): View
     {
+        $perPage = in_array($request->query('per_page'), ['5', '10', '25', '50', 'all'], true)
+            ? $request->query('per_page')
+            : '25';
+
         return view('movimentacoes.index', [
-            'movements' => $action->execute($request->integer('product_id') ?: null),
+            'movements' => $action->execute($request->integer('product_id') ?: null, $perPage),
             'products' => Product::with('stocks')->orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
             'defaultUnit' => Unit::default(),
             'selectedProductId' => $request->integer('product_id') ?: null,
+            'perPage' => $perPage,
         ]);
     }
 

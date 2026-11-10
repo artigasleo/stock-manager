@@ -39,13 +39,20 @@ class ProductController extends Controller implements HasMiddleware
     {
         $sort = $request->string('sort')->value() ?: null;
         $direction = $request->string('direction')->value() === 'desc' ? 'desc' : 'asc';
+        $search = $request->string('search')->value() ?: null;
+        $perPage = in_array($request->query('per_page'), ['5', '10', '25', '50', 'all'], true)
+            ? $request->query('per_page')
+            : '25';
+        $page = $request->integer('page', 1);
 
         return view('estoque.index', [
-            'products' => $action->execute(Unit::default(), $sort, $direction),
+            'products' => $action->execute(Unit::default(), $sort, $direction, $search, $perPage, $page),
             'categories' => Category::orderBy('name')->get(),
             'suppliers' => Supplier::orderBy('name')->get(),
             'sort' => $sort,
             'direction' => $direction,
+            'search' => $search,
+            'perPage' => $perPage,
         ]);
     }
 

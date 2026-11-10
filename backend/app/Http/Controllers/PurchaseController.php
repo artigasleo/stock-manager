@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\View\View;
@@ -26,14 +27,19 @@ class PurchaseController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(ListPurchase $action): View
+    public function index(Request $request, ListPurchase $action): View
     {
+        $perPage = in_array($request->query('per_page'), ['5', '10', '25', '50', 'all'], true)
+            ? $request->query('per_page')
+            : '25';
+
         return view('purchases.index', [
-            'purchases' => $action->execute(),
+            'purchases' => $action->execute($perPage),
             'suppliers' => Supplier::orderBy('name')->get(),
             'products' => Product::orderBy('name')->get(),
             'units' => Unit::where('active', true)->orderBy('name')->get(),
             'defaultUnit' => Unit::default(),
+            'perPage' => $perPage,
         ]);
     }
 

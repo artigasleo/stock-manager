@@ -33,6 +33,19 @@
             >
         </div>
 
+        <div>
+            <label class="block text-sm font-medium mb-1">Buscar</label>
+            <input
+                type="text"
+                name="search"
+                value="{{ $search }}"
+                placeholder="Produto ou fornecedor..."
+                class="rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            >
+        </div>
+
+        <input type="hidden" name="per_page" value="{{ $perPage }}">
+
         <button
             type="submit"
             class="rounded-md bg-brand text-brand-cream px-4 py-2 text-sm font-medium hover:bg-brand-dark cursor-pointer"
@@ -49,52 +62,55 @@
         </button>
     </form>
 
-    <div
-        x-data="{
-            search: '',
-            matches(name, supplier) {
-                if (!this.search) return true;
-                const q = this.search.toLowerCase();
-                return name.toLowerCase().includes(q) || (supplier && supplier.toLowerCase().includes(q));
-            },
-        }"
-    >
-        <div class="mb-4">
-            <input
-                type="text"
-                x-model="search"
-                placeholder="Buscar por nome do produto ou fornecedor..."
-                class="w-full max-w-md rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
-            >
-        </div>
-
-        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-stone-100 text-left text-stone-600">
+    <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-stone-100 text-left text-stone-600">
+                <tr>
+                    <th class="px-4 py-3">Produto</th>
+                    <th class="px-4 py-3">Fornecedor</th>
+                    <th class="px-4 py-3">Quantidade vendida</th>
+                    <th class="px-4 py-3">Faturamento (R$)</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-stone-200">
+                @forelse ($rows as $row)
                     <tr>
-                        <th class="px-4 py-3">Produto</th>
-                        <th class="px-4 py-3">Fornecedor</th>
-                        <th class="px-4 py-3">Quantidade vendida</th>
-                        <th class="px-4 py-3">Faturamento (R$)</th>
+                        <td class="px-4 py-3">{{ $row->product?->name ?? 'Produto removido' }}</td>
+                        <td class="px-4 py-3">{{ $row->product?->supplier?->name ?? '—' }}</td>
+                        <td class="px-4 py-3">{{ $row->total_quantity }}</td>
+                        <td class="px-4 py-3">R$ {{ number_format($row->total_revenue, 2, ',', '.') }}</td>
                     </tr>
-                </thead>
-                <tbody class="divide-y divide-stone-200">
-                    @forelse ($rows as $row)
-                        <tr x-show="matches(@js($row->product?->name ?? 'Produto removido'), @js($row->product?->supplier?->name))">
-                            <td class="px-4 py-3">{{ $row->product?->name ?? 'Produto removido' }}</td>
-                            <td class="px-4 py-3">{{ $row->product?->supplier?->name ?? '—' }}</td>
-                            <td class="px-4 py-3">{{ $row->total_quantity }}</td>
-                            <td class="px-4 py-3">R$ {{ number_format($row->total_revenue, 2, ',', '.') }}</td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="px-4 py-6 text-center text-stone-500">
-                                Nenhuma venda registrada nesse período.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-4 py-6 text-center text-stone-500">
+                            Nenhuma venda registrada nesse período.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+    <div class="flex items-center justify-between mt-4">
+        <form method="GET" action="{{ route('reports.products.index') }}" class="flex items-center gap-2">
+            <input type="hidden" name="from" value="{{ $from }}">
+            <input type="hidden" name="to" value="{{ $to }}">
+            <input type="hidden" name="search" value="{{ $search }}">
+
+            <label class="text-sm text-stone-600">Mostrar</label>
+            <select
+                name="per_page"
+                onchange="this.form.submit()"
+                class="rounded-md border border-stone-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            >
+                @foreach (['5' => '5 por página', '10' => '10 por página', '25' => '25 por página', '50' => '50 por página', 'all' => 'Ver tudo'] as $value => $label)
+                    <option value="{{ $value }}" @selected($perPage === (string) $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </form>
+
+        @if ($rows instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
+            {{ $rows->links() }}
+        @endif
     </div>
 @endsection
