@@ -41,7 +41,7 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <div class="px-4 py-3 border-b border-stone-200">
                 <h2 class="font-semibold text-brand-dark">Produtos mais vendidos ({{ $period === 'day' ? 'hoje' : 'no mês' }})</h2>
             </div>
@@ -72,7 +72,7 @@
             </table>
         </div>
 
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <div class="px-4 py-3 border-b border-stone-200">
                 <h2 class="font-semibold text-brand-dark">Produtos com mais faturamento ({{ $period === 'day' ? 'hoje' : 'no mês' }})</h2>
             </div>
@@ -101,7 +101,7 @@
             </table>
         </div>
 
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <div class="px-4 py-3 border-b border-stone-200 flex items-center justify-between">
                 <h2 class="font-semibold text-brand-dark">Formas de pagamento</h2>
 
@@ -147,7 +147,7 @@
             </table>
         </div>
 
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <div class="px-4 py-3 border-b border-stone-200">
                 <h2 class="font-semibold text-brand-dark">Produtos com estoque baixo</h2>
             </div>
@@ -178,7 +178,7 @@
             </table>
         </div>
 
-        <div class="bg-brand-paper rounded-lg shadow overflow-hidden">
+        <div class="bg-brand-paper rounded-lg shadow overflow-x-auto">
             <div class="px-4 py-3 border-b border-stone-200">
                 <h2 class="font-semibold text-brand-dark">Últimas movimentações</h2>
             </div>
