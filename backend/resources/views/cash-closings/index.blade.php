@@ -228,7 +228,7 @@
                         <th class="px-4 py-3">Diferença (R$)</th>
                         <th class="px-4 py-3">Cadastros de mães</th>
                         <th class="px-4 py-3">Fechado por</th>
-                        <th class="px-4 py-3"></th>
+                        <th class="sticky right-0 border-l border-stone-200 bg-stone-100 px-4 py-3"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
@@ -247,7 +247,7 @@
                             </td>
                             <td class="px-4 py-3">{{ $closing->moms_registered ?? '—' }}</td>
                             <td class="px-4 py-3">{{ $closing->closedBy->name }}</td>
-                            <td class="px-4 py-3">
+                            <td class="sticky right-0 border-l border-stone-200 bg-brand-paper px-4 py-3">
                                 <a
                                     href="{{ route('cashClosings.index', ['date' => $closing->date->format('Y-m-d')]) }}"
                                     class="text-brand hover:underline cursor-pointer text-xs"

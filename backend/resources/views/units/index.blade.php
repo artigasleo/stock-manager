@@ -39,7 +39,7 @@
                         <th class="px-4 py-3">Endereço</th>
                         <th class="px-4 py-3">Padrão</th>
                         <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3 w-32">Ações</th>
+                        <th class="sticky right-0 border-l border-stone-200 bg-stone-100 px-4 py-3 w-32">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-stone-200">
@@ -57,7 +57,7 @@
                                     {{ $unit->active ? 'Ativo' : 'Inativo' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3">
+                            <td class="sticky right-0 border-l border-stone-200 bg-brand-paper px-4 py-3">
                                 @can('units.edit')
                                     <button
                                         type="button"

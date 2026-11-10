@@ -59,7 +59,7 @@
                     <th class="px-4 py-3">Período</th>
                     <th class="px-4 py-3">Vendas</th>
                     <th class="px-4 py-3">Total</th>
-                    <th class="px-4 py-3 w-32">Ações</th>
+                    <th class="sticky right-0 border-l border-stone-200 bg-stone-100 px-4 py-3 w-32">Ações</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-stone-200">
@@ -68,7 +68,7 @@
                         <td class="px-4 py-3">{{ $row->label }}</td>
                         <td class="px-4 py-3">{{ $row->count }}</td>
                         <td class="px-4 py-3">R$ {{ number_format($row->total, 2, ',', '.') }}</td>
-                        <td class="px-4 py-3">
+                        <td class="sticky right-0 border-l border-stone-200 bg-brand-paper px-4 py-3">
                             <a
                                 href="{{ route('reports.detail', ['from' => $row->start->toIso8601String(), 'to' => $row->end->toIso8601String(), 'label' => $row->label, 'granularity' => $granularity]) }}"
                                 class="text-brand hover:underline cursor-pointer"
@@ -91,7 +91,7 @@
                         <td class="px-4 py-3">Total</td>
                         <td class="px-4 py-3">{{ $totalCount }}</td>
                         <td class="px-4 py-3">R$ {{ number_format($totalSum, 2, ',', '.') }}</td>
-                        <td class="px-4 py-3"></td>
+                        <td class="sticky right-0 border-l border-stone-200 bg-stone-100 px-4 py-3"></td>
                     </tr>
                 </tfoot>
             @endif
