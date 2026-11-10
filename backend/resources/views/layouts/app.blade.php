@@ -8,10 +8,23 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-brand-cream text-stone-800 antialiased">
-    <div class="min-h-screen flex flex-col">
+    <div class="min-h-screen flex flex-col" x-data="{ sidebarOpen: false }">
         <header class="bg-brand text-brand-cream shadow">
             <div class="flex items-center justify-between px-4 sm:px-6 py-1">
-                <img src="{{ asset('images/logo.png') }}" alt="Go &amp; Do Emporium" class="h-10 sm:h-16 w-auto">
+                <div class="flex items-center gap-3">
+                    <button
+                        type="button"
+                        @click="sidebarOpen = true"
+                        class="md:hidden rounded-md p-1.5 hover:bg-brand-dark cursor-pointer"
+                        aria-label="Abrir menu"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+                        </svg>
+                    </button>
+
+                    <img src="{{ asset('images/logo.png') }}" alt="Go &amp; Do Emporium" class="h-10 sm:h-16 w-auto">
+                </div>
 
                 @auth
                     <div class="flex items-center gap-4">
@@ -28,8 +41,18 @@
             </div>
         </header>
 
-        <div class="flex flex-1">
-            <nav class="w-60 bg-brand-paper border-r border-stone-200 p-4">
+        <div class="flex flex-1 relative">
+            <div
+                x-show="sidebarOpen"
+                x-cloak
+                @click="sidebarOpen = false"
+                class="fixed inset-0 bg-black/40 z-30 md:hidden"
+            ></div>
+
+            <nav
+                :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                class="fixed md:static inset-y-0 left-0 z-40 w-60 shrink-0 bg-brand-paper border-r border-stone-200 p-4 overflow-y-auto transition-transform duration-200 md:translate-x-0"
+            >
                 @php
                     $navItems = [
                         ['label' => 'Dashboard', 'route' => 'dashboard', 'permission' => 'dashboard.view'],
